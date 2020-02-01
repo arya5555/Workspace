@@ -18,21 +18,21 @@ computer. I believe that being able to link everything relevant to one course an
 is very useful. It is also of interest to me because I will get to learn how to have my application interact with
 other applications, such as by opening links and app shortcuts.
 
-## Functionality
+### Functionality
 
 **Base features that will be included in each space:**
 - Pin relevant website links, with button to quickly open all in new browser window
 - Pin relevant directories, with buttons to open pinned files or visit directories in file explorer
 - Pin shortcuts to relevant applications
-- Option to minimize or close all non-relevant apps and sites
 - To-do list
 - Start timer when you begin working, which plays a sound once finished
   - Once time is up, user can choose to add time, stop working, or time a short break
 
 **Additional features that could be added as time allows:**
+- To-do list can have due-dates and priority
+- Option to minimize or close all non-relevant apps and sites
 - A notification will appear if an unpinned application is opened or if blacklisted sites are visited in order to deter
 distraction
-- To-do list can have due-dates and priority
 - Account to back up data online
 - Collaborative group spaces
   - Spaces are accessible by invited group members
@@ -40,3 +40,21 @@ distraction
   - File sharing
   - Collaborative to-do list
   - Members can see when other members are working in this space, or busy working in another space
+
+### User Stories
+
+- As a user, I want to be able to create a new space and add it to a list of spaces
+- As a user, I want to be able to see a list of all spaces
+- As a user, I want to be able to add a website link, file path, or application to a list of resources in a space 
+(for an application, this means adding the path to an executable file)
+- As a user, I want to be able to open a link pinned in a space in my default browser
+- As a user, I want to be able to open a file pinned in a space (in an external program)
+- As a user, I want to be able to launch an application pinned in a space
+- As a user, I want to be able to delete a resource pinned in a space
+- As a user, I want to be able to start a timer for time to work in a space
+- As a user, I want to be able to add more time to a timer
+- As a user, I want to be able to set a break timer after a work timer
+- As a user, I want to be able to add a task to a to-do list within a space
+- As a user, I want to be able to mark a task as complete
+- As a user, I want to be able to delete a task from a space
+- As a user, I want to be able to display all relevant information about one space (resources and to-dos)
