@@ -30,9 +30,6 @@ other applications, such as by opening links and app shortcuts.
 
 **Additional features that could be added as time allows:**
 - To-do list can have due-dates and priority
-- Option to minimize or close all non-relevant apps and sites
-- A notification will appear if an unpinned application is opened or if blacklisted sites are visited in order to deter
-distraction
 - Account to back up data online
 - Collaborative group spaces
   - Spaces are accessible by invited group members
@@ -40,6 +37,9 @@ distraction
   - File sharing
   - Collaborative to-do list
   - Members can see when other members are working in this space, or busy working in another space
+- Option to minimize or close all non-relevant apps and sites
+- A notification will appear if an unpinned application is opened or if blacklisted sites are visited in order to deter
+distraction
 
 ### User Stories
 
@@ -47,14 +47,9 @@ distraction
 - As a user, I want to be able to see a list of all spaces
 - As a user, I want to be able to add a website link, file path, or application to a list of resources in a space 
 (for an application, this means adding the path to an executable file)
-- As a user, I want to be able to open a link pinned in a space in my default browser
-- As a user, I want to be able to open a file pinned in a space (in an external program)
-- As a user, I want to be able to launch an application pinned in a space
-- As a user, I want to be able to delete a resource pinned in a space
+- As a user, I want to be able to open my resources (links, files, apps) in an external program
 - As a user, I want to be able to start a timer for time to work in a space
 - As a user, I want to be able to add more time to a timer
 - As a user, I want to be able to set a break timer after a work timer
 - As a user, I want to be able to add a task to a to-do list within a space
-- As a user, I want to be able to mark a task as complete
-- As a user, I want to be able to delete a task from a space
-- As a user, I want to be able to display all relevant information about one space (resources and to-dos)
+- As a user, I want to be able to mark a task as complete or delete it from a space
