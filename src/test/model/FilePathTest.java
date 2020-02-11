@@ -20,7 +20,6 @@ class FilePathTest {
     @BeforeEach
     public void setUp() {
         fileSeparator = System.getProperty("file.separator");
-
         testFile = new File("TestDirectory" + fileSeparator + "test.txt");
 
         try {

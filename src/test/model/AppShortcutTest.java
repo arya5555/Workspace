@@ -1,8 +1,10 @@
 package model;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,23 +14,33 @@ public class AppShortcutTest {
     Resource appShortcut;
     String fileSeparator;
     String testAppPath;
+    String testTextFilePath;
+    File testAppFile;
+    File testTextFile;
 
     @BeforeEach
     public void setUp(){
         fileSeparator = System.getProperty("file.separator");
         testAppPath = "data" + fileSeparator + "DoNothing.exe";
         try {
-            appShortcut = new AppShortcut("DoNothing", testAppPath);
+            appShortcut = new AppShortcut("Test App", testAppPath);
         } catch (NoSuchFileException e) {
             fail();
         }
+    }
+
+    @AfterEach
+    public void deleteFiles() {
+        testAppFile.delete();
+        testTextFile.delete();
+        testAppFile.getParentFile().delete();
     }
 
     @Test
     public void testSetInvalidFile() {
         boolean failed = false;
         try {
-            appShortcut.setPath("." + fileSeparator + "data" + fileSeparator + "timer.png");
+            appShortcut.setPath(testTextFilePath);
         } catch (Exception e) {
             failed = true;
         }
