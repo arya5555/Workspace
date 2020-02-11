@@ -2,10 +2,7 @@ package model;
 
 import ui.platformspecific.SystemTrayTool;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,33 +15,24 @@ public class WorkTimer implements Runnable {
     private Thread callingThread;
     private SystemTrayTool systemTrayTool;
     private int updateDelay;
+    private Image icon;
 
     // EFFECTS: creates new timer with given time in minutes
-    public WorkTimer(int minutes, Thread callingThread) {
+    public WorkTimer(int minutes, Thread callingThread, Image icon) {
         timer = new Timer();
-        task = new Tick();
         task = new Tick();
         this.minutes = minutes;
         this.seconds = 0;
+        this.icon = icon;
         this.callingThread = callingThread;
         this.updateDelay = UPDATE_DELAY;
-
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        URL imageUrl = classLoader.getResource("timer.png");
-        Image taskBarIcon;
-        if (imageUrl == null) {
-            // creates empty image if icon is not found
-            taskBarIcon = new BufferedImage(10,10, 1);
-        } else {
-            taskBarIcon = new ImageIcon(imageUrl).getImage();
-        }
-        systemTrayTool = new SystemTrayTool(taskBarIcon);
     }
 
     // EFFECTS: runs the timer
     @Override
     public void run() {
-        timer.schedule(task, updateDelay, updateDelay);
+        systemTrayTool = new SystemTrayTool(icon);
+        timer.scheduleAtFixedRate(task, updateDelay, updateDelay);
     }
 
     //getters

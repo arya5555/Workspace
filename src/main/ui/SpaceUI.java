@@ -3,7 +3,11 @@ package ui;
 import model.*;
 import ui.platformspecific.ResourceLauncher;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -26,16 +30,14 @@ public class SpaceUI {
     private static final String CANCEL_CMD = "CANCEL";
     private static final String HELP_CMD = "HELP";
     private static final String CANCEL_TIMER_CMD = "CANCEL TIMER";
+    private static final String TIMER_ICON_FILE = "timer.png";
 
     private Space space;
     private BufferedReader userInput;
-    private boolean timerRunning;
-    private WorkTimer timer;
 
     // EFFECTS: initializes and runs the ui for a space
     public SpaceUI(Space space) {
         this.space = space;
-        timerRunning = false;
         runSpaceUI();
     }
 
@@ -69,17 +71,17 @@ public class SpaceUI {
     //          or if there is an IO error, throws IOException
     //          otherwise waits for input and returns it
     private String getInput() throws InterruptedException, IOException {
-        while (timerRunning && !userInput.ready()) {
+        while (space.isTimerRunning() && !userInput.ready()) {
             Thread.sleep(100);
         }
         return userInput.readLine();
     }
 
     // MODIFIES: this
-    // EFFECTS: stops timer and alerts the user with a popup message, if supported by system
+    // EFFECTS: prints that timer time is up
     private void timeUp() {
         System.out.println("Time's up!");
-        timerRunning = false;
+        space.timeUp();
     }
 
     // MODIFIES: this
@@ -104,41 +106,36 @@ public class SpaceUI {
         } else if (input.startsWith(START_TIMER_CMD)) {
             startTimer(input.substring(START_TIMER_CMD.length()));
         } else if (input.equals(CANCEL_TIMER_CMD)) {
-            cancelTimer();
+            space.cancelTimer();
         } else {
             invalidCommand();
         }
     }
 
     // MODIFIES: this
-    // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
-    private void cancelTimer() {
-        if (timerRunning) {
-            timer.cancelTimer();
-        }
-        timerRunning = false;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: starts a new timer thread
+    // EFFECTS: processes input to start a new timer
     private void startTimer(String input) {
-        int mins;
+        int minutes;
         try {
-            mins = getIntFromInput(input);
+            minutes = getIntFromInput(input);
         } catch (Exception e) {
             invalidCommand();
             return;
         }
 
-        if (mins < 0) {
+        if (minutes < 0) {
             System.out.println("Timer length cannot be negative.");
             return;
         }
 
-        Thread.currentThread().setName(space.getName());
-        timer = new WorkTimer(mins, Thread.currentThread());
-        timer.run();
-        timerRunning = true;
+        Image icon;
+        try {
+            icon = ImageIO.read(new File("./data/" + TIMER_ICON_FILE));
+        } catch (IOException e) {
+            icon = new BufferedImage(10, 10, 1);
+        }
+
+        space.startTimer(minutes, Thread.currentThread(), icon);
     }
 
     // MODIFIES: this
@@ -276,14 +273,14 @@ public class SpaceUI {
         displayTodo();
         displayTimer();
 
-        System.out.println("Enter " + EXIT_CMD + " to exit this space.");
-        System.out.println("Enter " + HELP_CMD + " to see all commands.");
+        System.out.println("Enter \"" + EXIT_CMD + "\" to exit this space.");
+        System.out.println("Enter \"" + HELP_CMD + "\" to see all commands.");
     }
 
     // EFFECTS: if timer is started, displays time, otherwise does nothing
     private void displayTimer() {
-        if (timerRunning) {
-            System.out.println("Work time left: " + timer.getTime());
+        if (space.isTimerRunning()) {
+            System.out.println("Work time left: " + space.getTimeOnTimer());
         }
     }
 
@@ -316,6 +313,8 @@ public class SpaceUI {
         System.out.println("To complete a task, enter \"" + COMPLETE_TASK_CMD + " <task number>\"");
         System.out.println("To add a task, enter \"" + ADD_TASK_CMD + "\"");
         System.out.println("To delete a task, enter \"" + DELETE_TASK_CMD + " <task number>\"");
+        System.out.println("To start a timer, enter \"" + START_TIMER_CMD + " <# of minutes>\"");
+        System.out.println("To cancel a timer, enter \"" + CANCEL_TIMER_CMD + "\"");
     }
 
     // EFFECTS: displays table with given title and with each row numbered {1,2,3...}

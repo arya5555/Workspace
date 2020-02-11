@@ -28,7 +28,7 @@ public class AppShortcutTest {
     public void testSetInvalidFile() {
         boolean failed = false;
         try {
-            appShortcut.setPath("data" + fileSeparator + "invalid_file.txt");
+            appShortcut.setPath("." + fileSeparator + "data" + fileSeparator + "timer.png");
         } catch (Exception e) {
             failed = true;
         }

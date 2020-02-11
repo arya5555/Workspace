@@ -1,5 +1,8 @@
 package model;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +11,15 @@ public class Space {
     private String name;
     private List<Resource> resources;
     private ToDoList todo;
+    private boolean timerRunning;
+    private WorkTimer timer;
 
     // EFFECTS: initializes new space with given name, no resources, and empty to-do list
     public Space(String name) {
         this.name = name;
         this.resources = new ArrayList<>();
         this.todo = new ToDoList();
+        timerRunning = false;
     }
 
     // MODIFIES: this
@@ -52,6 +58,37 @@ public class Space {
         return names;
     }
 
+    // MODIFIES: this
+    // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
+    public void cancelTimer() {
+        if (timerRunning) {
+            timer.cancelTimer();
+        }
+        timerRunning = false;
+    }
+
+    // REQUIRES: minutes >= 0
+    // MODIFIES: this
+    // EFFECTS: starts a new timer thread
+    public void startTimer(int minutes, Thread callingThread, Image icon) {
+        Thread.currentThread().setName(name);
+        timer = new WorkTimer(minutes, callingThread, icon);
+        timer.run();
+        timerRunning = true;
+    }
+
+    // REQUIRES: getTimerRunning() is true
+    // EFFECTS: returns formatted time left on timer
+    public String getTimeOnTimer() {
+        return timer.getTime();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: tells space that timer time is up
+    public void timeUp() {
+        timerRunning = false;
+    }
+
     //getters
     public List<Resource> getResources() {
         return resources;
@@ -63,5 +100,9 @@ public class Space {
 
     public ToDoList getTodo() {
         return todo;
+    }
+
+    public boolean isTimerRunning() {
+        return timerRunning;
     }
 }

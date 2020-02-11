@@ -3,6 +3,8 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,12 +33,33 @@ public class SpaceTest {
         assertEquals("MATH", space.getName());
         assertEquals(0, space.getResources().size());
         assertEquals(0, space.getTodo().getNumToDos());
+        assertFalse(space.isTimerRunning());
     }
 
     @Test
     public void testGetResourceOfName() {
         space.addResource(textbookLink);
         assertEquals(textbookLink, space.getResourceOfName("Textbook"));
+    }
+
+    @Test
+    public void testRunTimer() {
+        Image emptyImage = new BufferedImage(10, 10, 1);
+        space.startTimer(5, Thread.currentThread(), emptyImage);
+        assertEquals("0:05:00", space.getTimeOnTimer());
+        assertTrue(space.isTimerRunning());
+        space.cancelTimer();
+        assertFalse(space.isTimerRunning());
+    }
+
+    @Test
+    public void testTimeUp() {
+        Image emptyImage = new BufferedImage(10, 10, 1);
+        space.startTimer(5, Thread.currentThread(), emptyImage);
+        space.timeUp();
+        assertFalse(space.isTimerRunning());
+        space.cancelTimer();
+        assertFalse(space.isTimerRunning());
     }
 
     @Test

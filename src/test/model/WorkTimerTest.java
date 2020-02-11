@@ -1,18 +1,29 @@
 package model;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WorkTimerTest {
     private static final int DELAY = 200;
+    private static final String TIMER_ICON_FILE = "timer.png";
     WorkTimer timer;
+    Image icon;
 
     @BeforeEach
     public void setUp() {
-        timer = new WorkTimer(10, Thread.currentThread());
+        try {
+            icon = ImageIO.read(new File("./data/timer.png"));
+        } catch (IOException e) {
+            fail();
+        }
+        timer = new WorkTimer(10, Thread.currentThread(), icon);
         timer.setDelayForTesting(DELAY);
     }
 
@@ -39,20 +50,22 @@ public class WorkTimerTest {
     }
 
     @Test
-    public void testCancelTimer() {
+    public void testForcedCancelTimer() {
+        timer = new WorkTimer(0, Thread.currentThread(), icon);
         timer.run();
-        timer.cancelTimer();
+
         try {
+            Thread.sleep(DELAY);
+            timer.cancelTimer();
             Thread.sleep(DELAY * 2);
         } catch (InterruptedException e) {
             fail();
         }
-        assertEquals("0:10:00", timer.getTime());
     }
 
     @Test
     public void testTimeUp() {
-        timer = new WorkTimer(0, Thread.currentThread());
+        timer = new WorkTimer(0, Thread.currentThread(), icon);
         boolean interrupted = false;
         timer.run();
 
