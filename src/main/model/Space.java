@@ -60,7 +60,6 @@ public class Space {
         return names;
     }
 
-
     // EFFECTS: attempts to launch resource with given index
     //          if index is out of bounds, throws IndexOutOfBoundsException
     //          if system does not support launching this resource, throws SystemNotSupportedException
@@ -84,15 +83,6 @@ public class Space {
         }
     }
 
-    // MODIFIES: this
-    // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
-    public void cancelTimer() {
-        if (timerRunning) {
-            timer.cancelTimer();
-        }
-        timerRunning = false;
-    }
-
     // REQUIRES: minutes >= 0
     // MODIFIES: this
     // EFFECTS: starts a new timer thread
@@ -101,6 +91,15 @@ public class Space {
         timer = new WorkTimer(minutes, callingThread, icon);
         timer.run();
         timerRunning = true;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
+    public void cancelTimer() {
+        if (timerRunning) {
+            timer.cancelTimer();
+        }
+        timerRunning = false;
     }
 
     // REQUIRES: getTimerRunning() is true

@@ -70,6 +70,64 @@ public class SpaceUI {
         }
     }
 
+    // EFFECTS: initializes space
+    private void init() {
+        userInput = new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    // EFFECTS: displays all space info
+    private void displaySpaceMenu() {
+        System.out.println();
+        System.out.println(space.getName());
+        System.out.println();
+        displayResources();
+        displayTodo();
+        displayTimer();
+
+        System.out.println("Enter \"" + EXIT_CMD + "\" to exit this space.");
+        System.out.println("Enter \"" + HELP_CMD + "\" to see all commands.");
+    }
+
+    // EFFECTS: if timer is started, displays time, otherwise does nothing
+    private void displayTimer() {
+        if (space.isTimerRunning()) {
+            System.out.println("Work time left: " + space.getTimeOnTimer());
+        }
+    }
+
+    // EFFECTS: if this space has resources, displays them in a numbered table
+    private void displayResources() {
+        if (space.getResources().size() > 0) {
+            displayNumberedTable("Resources", space.getAllResourceNames());
+        } else {
+            System.out.println("You don't have any resources yet.");
+        }
+        System.out.println();
+    }
+
+    // EFFECTS: if this space has tasks in its to-do list, displays tasks in a numbered table
+    private void displayTodo() {
+        if (space.getTodo().getNumToDos() > 0) {
+            displayNumberedTable("To-Do", space.getTodo().getAllTaskDescriptions());
+        } else {
+            System.out.println("You don't have any tasks in your to-do list yet.");
+        }
+        System.out.println();
+    }
+
+    // EFFECTS: displays all commands
+    private void helpMenu() {
+        System.out.println("To open a resource, enter \"" + OPEN_RESOURCE_CMD + " <resource number>\"");
+        System.out.println("To open all resources, enter \"" + OPEN_RESOURCE_CMD + " " + OPEN_ALL_CMD + "\"");
+        System.out.println("To add a resource, enter \"" + ADD_RESOURCE_CMD + "\"");
+        System.out.println("To delete a resource, enter \"" + DELETE_RESOURCE_CMD + " <resource number>\"");
+        System.out.println("To complete a task, enter \"" + COMPLETE_TASK_CMD + " <task number>\"");
+        System.out.println("To add a task, enter \"" + ADD_TASK_CMD + "\"");
+        System.out.println("To delete a task, enter \"" + DELETE_TASK_CMD + " <task number>\"");
+        System.out.println("To start a timer, enter \"" + START_TIMER_CMD + " <# of minutes>\"");
+        System.out.println("To cancel a timer, enter \"" + CANCEL_TIMER_CMD + "\"");
+    }
+
     // EFFECTS: if timer interrupts, throws TimeUpException
     //          or if there is an IO error, throws IOException
     //          otherwise waits for input and returns it
@@ -78,13 +136,6 @@ public class SpaceUI {
             Thread.sleep(100);
         }
         return userInput.readLine();
-    }
-
-    // MODIFIES: this
-    // EFFECTS: prints that timer time is up
-    private void timeUp() {
-        System.out.println("Time's up!");
-        space.timeUp();
     }
 
     // MODIFIES: this
@@ -150,6 +201,13 @@ public class SpaceUI {
         }
 
         space.startTimer(minutes, Thread.currentThread(), icon);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prints that timer time is up
+    private void timeUp() {
+        System.out.println("Time's up!");
+        space.timeUp();
     }
 
     // MODIFIES: this
@@ -248,12 +306,6 @@ public class SpaceUI {
         }
     }
 
-    // EFFECTS: if input string is an int, ignoring white spaces, returns int
-    public int getIntFromInput(String input) throws NumberFormatException {
-        input = input.replaceAll("\\s+", "");
-        return Integer.parseInt(input);
-    }
-
     // EFFECTS: if input is valid resource number, attempts to launch resource, otherwise outputs error message
     private void launchResource(String input) {
         int resourceNumber;
@@ -276,62 +328,10 @@ public class SpaceUI {
         }
     }
 
-    // EFFECTS: initializes space
-    private void init() {
-        userInput = new BufferedReader(new InputStreamReader(System.in));
-    }
-
-    // EFFECTS: displays all space info
-    private void displaySpaceMenu() {
-        System.out.println();
-        System.out.println(space.getName());
-        System.out.println();
-        displayResources();
-        displayTodo();
-        displayTimer();
-
-        System.out.println("Enter \"" + EXIT_CMD + "\" to exit this space.");
-        System.out.println("Enter \"" + HELP_CMD + "\" to see all commands.");
-    }
-
-    // EFFECTS: if timer is started, displays time, otherwise does nothing
-    private void displayTimer() {
-        if (space.isTimerRunning()) {
-            System.out.println("Work time left: " + space.getTimeOnTimer());
-        }
-    }
-
-    // EFFECTS: if this space has resources, displays them in a numbered table
-    private void displayResources() {
-        if (space.getResources().size() > 0) {
-            displayNumberedTable("Resources", space.getAllResourceNames());
-        } else {
-            System.out.println("You don't have any resources yet.");
-        }
-        System.out.println();
-    }
-
-    // EFFECTS: if this space has tasks in its to-do list, displays tasks in a numbered table
-    private void displayTodo() {
-        if (space.getTodo().getNumToDos() > 0) {
-            displayNumberedTable("To-Do", space.getTodo().getAllTaskDescriptions());
-        } else {
-            System.out.println("You don't have any tasks in your to-do list yet.");
-        }
-        System.out.println();
-    }
-
-    // EFFECTS: displays all commands
-    private void helpMenu() {
-        System.out.println("To open a resource, enter \"" + OPEN_RESOURCE_CMD + " <resource number>\"");
-        System.out.println("To open all resources, enter \"" + OPEN_RESOURCE_CMD + " " + OPEN_ALL_CMD + "\"");
-        System.out.println("To add a resource, enter \"" + ADD_RESOURCE_CMD + "\"");
-        System.out.println("To delete a resource, enter \"" + DELETE_RESOURCE_CMD + " <resource number>\"");
-        System.out.println("To complete a task, enter \"" + COMPLETE_TASK_CMD + " <task number>\"");
-        System.out.println("To add a task, enter \"" + ADD_TASK_CMD + "\"");
-        System.out.println("To delete a task, enter \"" + DELETE_TASK_CMD + " <task number>\"");
-        System.out.println("To start a timer, enter \"" + START_TIMER_CMD + " <# of minutes>\"");
-        System.out.println("To cancel a timer, enter \"" + CANCEL_TIMER_CMD + "\"");
+    // EFFECTS: if input string is an int, ignoring white spaces, returns int
+    private int getIntFromInput(String input) throws NumberFormatException {
+        input = input.replaceAll("\\s+", "");
+        return Integer.parseInt(input);
     }
 
     // EFFECTS: displays table with given title and with each row numbered {1,2,3...}

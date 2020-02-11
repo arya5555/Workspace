@@ -19,14 +19,13 @@ public class ResourceLauncher {
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
                     desktop.open(file);
-                    return;
                 } catch (Exception e) {
                     throw new FailedToOpenException();
                 }
             }
+        } else {
+            throw new SystemNotSupportedException();
         }
-
-        throw new SystemNotSupportedException();
     }
 
     /// EFFECTS: if desktop is supported, opens given site and returns true if successful

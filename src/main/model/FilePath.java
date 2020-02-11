@@ -13,17 +13,17 @@ public class FilePath implements Resource {
     protected String name;
     protected File file;
 
+    // EFFECTS: initializes FilePath with given name and path, throws exception if path is not valid
+    public FilePath(String name, String path) throws NoSuchFileException {
+        this.name = name;
+        setPath(path);
+    }
+
     // EFFECTS: initializes empty, unnamed FilePath object
     //          only to be used by AppShortcut subclass
     protected FilePath() {
         this.name = "";
         this.file = null;
-    }
-
-    // EFFECTS: initializes FilePath with given name and path, throws exception if path is not valid
-    public FilePath(String name, String path) throws NoSuchFileException {
-        this.name = name;
-        setPath(path);
     }
 
     // EFFECTS: if system does not support opening files, throws SystemNotSupportedException
@@ -46,6 +46,17 @@ public class FilePath implements Resource {
         return "";
     }
 
+    // EFFECTS: attempts to set file to given path, throws exception if path is not valid
+    @Override
+    public void setPath(String path) throws NoSuchFileException {
+        File newFile = new File(path);
+        if (newFile.exists()) {
+            file = new File(path);
+        } else {
+            throw new NoSuchFileException(path);
+        }
+    }
+
     //getters
     @Override
     public String getName() {
@@ -60,18 +71,5 @@ public class FilePath implements Resource {
     @Override
     public String getResourceType() {
         return FILE_RESOURCE_TYPE;
-    }
-
-     //setters
-
-    // EFFECTS: attempts to set file to given path, throws exception if path is not valid
-    @Override
-    public void setPath(String path) throws NoSuchFileException {
-        File newFile = new File(path);
-        if (newFile.exists()) {
-            file = new File(path);
-        } else {
-            throw new NoSuchFileException(path);
-        }
     }
 }
