@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WorkTimerTest {
+    private static final int DELAY = 200;
     WorkTimer timer;
 
     @BeforeEach
     public void setUp() {
         timer = new WorkTimer(10, Thread.currentThread());
+        timer.setDelayForTesting(DELAY);
     }
 
     @Test
@@ -25,15 +27,15 @@ public class WorkTimerTest {
     public void testRunTimer() {
         timer.run();
         try {
-            Thread.sleep(1100);
+            Thread.sleep(DELAY * 2 + 100);
         } catch (InterruptedException e) {
             fail();
         }
         int minutes = timer.getMinutes();
         int seconds = timer.getSeconds();
-        assertEquals("0:09:59", timer.getTime());
+        assertEquals("0:09:58", timer.getTime());
         assertEquals(9, minutes);
-        assertEquals(59, seconds);
+        assertEquals(58, seconds);
     }
 
     @Test
@@ -41,7 +43,7 @@ public class WorkTimerTest {
         timer.run();
         timer.cancelTimer();
         try {
-            Thread.sleep(1100);
+            Thread.sleep(DELAY * 2);
         } catch (InterruptedException e) {
             fail();
         }
@@ -53,10 +55,9 @@ public class WorkTimerTest {
         timer = new WorkTimer(0, Thread.currentThread());
         boolean interrupted = false;
         timer.run();
-        int numThreads = Thread.activeCount();
 
         try {
-            Thread.sleep(1100);
+            Thread.sleep(DELAY + 1000);
         } catch (InterruptedException e) {
             interrupted = true;
         } finally {

@@ -1,7 +1,7 @@
 package ui;
 
 import model.*;
-import platformspecific.ResourceLauncher;
+import ui.platformspecific.ResourceLauncher;
 
 import java.io.BufferedReader;
 import java.io.IOException;

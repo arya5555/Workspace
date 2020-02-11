@@ -10,13 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppShortcutTest {
     Resource appShortcut;
+    String fileSeparator;
     String testAppPath;
 
     @BeforeEach
     public void setUp(){
-        testAppPath = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+        fileSeparator = System.getProperty("file.separator");
+        testAppPath = "data" + fileSeparator + "DoNothing.exe";
         try {
-            appShortcut = new AppShortcut("Chrome", testAppPath);
+            appShortcut = new AppShortcut("DoNothing", testAppPath);
         } catch (NoSuchFileException e) {
             fail();
         }
@@ -26,7 +28,7 @@ public class AppShortcutTest {
     public void testSetInvalidFile() {
         boolean failed = false;
         try {
-            appShortcut.setPath("C:\\Program Files (x86)\\Google\\Chrome\\Application");
+            appShortcut.setPath("data" + fileSeparator + "invalid_file.txt");
         } catch (Exception e) {
             failed = true;
         }

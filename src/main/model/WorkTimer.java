@@ -1,6 +1,6 @@
 package model;
 
-import platformspecific.SystemTrayTool;
+import ui.platformspecific.SystemTrayTool;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +15,7 @@ public class WorkTimer implements Runnable {
     private int seconds;
     private Thread callingThread;
     private SystemTrayTool systemTrayTool;
+    private int updateDelay;
 
     // EFFECTS: creates new timer with given time in minutes
     public WorkTimer(int minutes, Thread callingThread) {
@@ -24,15 +25,17 @@ public class WorkTimer implements Runnable {
         this.minutes = minutes;
         this.seconds = 0;
         this.callingThread = callingThread;
+        this.updateDelay = UPDATE_DELAY;
 
         ClassLoader classLoader = this.getClass().getClassLoader();
         Image taskBarIcon = new ImageIcon(classLoader.getResource("timer.png")).getImage();
         systemTrayTool = new SystemTrayTool(taskBarIcon);
     }
 
+    // EFFECTS: runs the timer
     @Override
     public void run() {
-        timer.schedule(task, UPDATE_DELAY, UPDATE_DELAY);
+        timer.schedule(task, updateDelay, updateDelay);
     }
 
     //getters
@@ -72,6 +75,12 @@ public class WorkTimer implements Runnable {
     // EFFECTS: adds to timer the given number of minutes
     public void addTime(int minutes) {
         this.minutes += minutes;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: for testing purposes only, changes update delay
+    public void setDelayForTesting(int milliseconds) {
+        updateDelay = milliseconds;
     }
 
     private class Tick extends TimerTask {

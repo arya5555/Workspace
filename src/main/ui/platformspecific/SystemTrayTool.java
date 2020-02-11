@@ -1,4 +1,4 @@
-package platformspecific;
+package ui.platformspecific;
 
 import java.awt.*;
 

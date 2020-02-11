@@ -1,7 +1,5 @@
 package model;
 
-import platformspecific.ResourceLauncher;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;

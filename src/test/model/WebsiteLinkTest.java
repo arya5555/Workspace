@@ -43,12 +43,12 @@ class WebsiteLinkTest {
     public void testSetValidPath() {
         boolean failed = false;
         try {
-            websiteLink.setPath("https://ubc.ca");
+            websiteLink.setPath("http://ubc.ca");
         } catch (Exception e){
             failed = true;
         }
 
         assertFalse(failed);
-        assertEquals("https://ubc.ca", websiteLink.getPath());
+        assertEquals("http://ubc.ca", websiteLink.getPath());
     }
 }

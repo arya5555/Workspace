@@ -1,7 +1,5 @@
 package model;
 
-import platformspecific.ResourceLauncher;
-
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
