@@ -7,21 +7,21 @@ import org.junit.jupiter.api.Test;
 import java.awt.*;
 import java.io.File;
 
+import static model.FilePath.FILE_RESOURCE_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilePathTest {
-    FilePath filePath;
     File testFile;
     String fileSeparator;
+    FilePath filePath;
 
     // source for how to create file with default file separator:
     // https://www.journaldev.com/825/java-create-new-file
     @BeforeEach
     public void setUp() {
         fileSeparator = System.getProperty("file.separator");
-        String homePath = System.getProperty("user.home");
 
-        testFile = new File(homePath + fileSeparator + "Test" + fileSeparator + "test.txt");
+        testFile = new File("TestDirectory" + fileSeparator + "test.txt");
 
         try {
             testFile.getParentFile().mkdirs();
@@ -47,6 +47,7 @@ class FilePathTest {
     public void testConstructor() {
         assertEquals("TestFile", filePath.getName());
         assertEquals(testFile.getPath(), filePath.getPath());
+        assertEquals(FILE_RESOURCE_TYPE, filePath.getResourceType());
     }
 
     @Test
@@ -59,23 +60,13 @@ class FilePathTest {
     public void testSetNonexistantFile() {
         boolean failed = false;
         try {
-            filePath.setPath(testFile.getParentFile().getPath() + "assuming_this_file_doesnt_exist.txt");
+            filePath.setPath("TestDirectory" + fileSeparator + "assuming_this_file_doesnt_exist.txt");
         } catch (Exception e) {
             failed = true;
         }
 
         assertTrue(failed);
         assertEquals(testFile.getPath(), filePath.getPath());
-    }
-
-    @Test
-    public void testLaunch() {
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Desktop.Action.BROWSE)) {
-            assertTrue(filePath.launch());
-        } else {
-            assertFalse(filePath.launch());
-        }
     }
 
     @Test

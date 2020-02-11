@@ -34,9 +34,4 @@ public class AppShortcutTest {
         assertTrue(failed);
         assertEquals(testAppPath, appShortcut.getPath());
     }
-
-    @Test
-    public void testLaunch() {
-        assertTrue(appShortcut.launch());
-    }
 }

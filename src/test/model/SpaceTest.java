@@ -46,19 +46,6 @@ public class SpaceTest {
     }
 
     @Test
-    public void testLaunchResource() {
-        space.addResource(textbookLink);
-        assertTrue(space.launchResource(0));
-    }
-
-    @Test
-    public void testLaunchAllResources() {
-        space.addResource(textbookLink);
-        space.addResource(googleLink);
-        assertTrue(space.launchAllResources());
-    }
-
-    @Test
     public void testRemoveResource() {
         Resource textbookLink;
         Resource googleLink;

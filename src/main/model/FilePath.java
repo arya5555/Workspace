@@ -1,11 +1,13 @@
 package model;
 
-import java.awt.*;
+import platformspecific.ResourceLauncher;
+
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 // represents a file with a name and a File object
 public class FilePath implements Resource {
+    public static final String FILE_RESOURCE_TYPE = "FILE";
     protected String name;
     protected File file;
 
@@ -19,26 +21,6 @@ public class FilePath implements Resource {
     public FilePath(String name, String path) throws NoSuchFileException {
         this.name = name;
         setPath(path);
-    }
-
-    @Override
-    // EFFECTS: if file exists and operating system is supported, returns true and opens file in default external
-    // application otherwise, returns false
-
-    // source for how to open file in external application:
-    // https://stackoverflow.com/questions/550329/how-to-open-a-file-with-the-default-associated-program
-    public boolean launch() {
-        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            try {
-                desktop.open(file);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        return false;
     }
 
     // EFFECTS: returns file's extension
@@ -63,6 +45,11 @@ public class FilePath implements Resource {
     @Override
     public String getPath() {
         return file.getPath();
+    }
+
+    @Override
+    public String getResourceType() {
+        return FILE_RESOURCE_TYPE;
     }
 
      //setters

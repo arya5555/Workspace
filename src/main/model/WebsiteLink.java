@@ -1,6 +1,7 @@
 package model;
 
-import java.awt.*;
+import platformspecific.ResourceLauncher;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 // represents a website with a name and URL
 public class WebsiteLink implements Resource {
+    public static final String WEBSITE_RESOURCE_TYPE = "WEBSITE";
     private static List<Character> VALID_URL_CHARS;
     private String name;
     private URL url;
@@ -25,26 +27,6 @@ public class WebsiteLink implements Resource {
         setPath(url);
     }
 
-    // EFFECTS: Opens link in default browser, returns true if successful
-    // or false if there is an error
-
-    // source for how to open link in browser:
-    // https://stackoverflow.com/questions/10967451/open-a-link-in-browser-with-java-button
-    @Override
-    public boolean launch() {
-        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            try {
-                desktop.browse(this.url.toURI());
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
     //getters
     @Override
     public String getName() {
@@ -54,6 +36,11 @@ public class WebsiteLink implements Resource {
     @Override
     public String getPath() {
         return url.toString();
+    }
+
+    @Override
+    public String getResourceType() {
+        return WEBSITE_RESOURCE_TYPE;
     }
 
     //setters

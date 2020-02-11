@@ -52,25 +52,6 @@ public class Space {
         return names;
     }
 
-    // EFFECTS: launches all resources in this space, returns true if successful
-    // returns false if there is an error
-    public boolean launchAllResources() {
-        boolean successful = true;
-        for (Resource r : resources) {
-            if (!(r.launch())) {
-                successful = false;
-            }
-        }
-
-        return successful;
-    }
-
-    // REQUIRES: 0 <= resourceIndex < # resources
-    // EFFECTS: launches resource of given index
-    public boolean launchResource(int resourceIndex) {
-        return resources.get(resourceIndex).launch();
-    }
-
     //getters
     public List<Resource> getResources() {
         return resources;

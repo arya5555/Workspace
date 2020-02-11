@@ -3,7 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
+import static model.WebsiteLink.WEBSITE_RESOURCE_TYPE;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,6 +23,7 @@ class WebsiteLinkTest {
     public void testConstructor() {
         assertEquals("Canvas", websiteLink.getName());
         assertEquals("https://canvas.ubc.ca/", websiteLink.getPath());
+        assertEquals(WEBSITE_RESOURCE_TYPE, websiteLink.getResourceType());
     }
 
     @Test
@@ -49,15 +50,5 @@ class WebsiteLinkTest {
 
         assertFalse(failed);
         assertEquals("https://ubc.ca", websiteLink.getPath());
-    }
-
-    @Test
-    public void testLaunch() {
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Desktop.Action.BROWSE)) {
-            assertTrue(websiteLink.launch());
-        } else {
-            assertFalse(websiteLink.launch());
-        }
     }
 }

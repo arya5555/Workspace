@@ -1,9 +1,12 @@
 package ui;
 
 import model.*;
+import platformspecific.ResourceLauncher;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Scanner;
 
 // Command line UI within a space
 public class SpaceUI {
@@ -15,19 +18,24 @@ public class SpaceUI {
     private static final String ADD_TASK_CMD = "ADD TASK";
     private static final String DELETE_TASK_CMD = "DEL TASK";
     private static final String COMPLETE_TASK_CMD = "DONE";
+    private static final String START_TIMER_CMD = "TIMER";
     private static final String EXIT_CMD = "EXIT";
     private static final String LINK_CMD = "LINK";
     private static final String APP_CMD = "APP";
     private static final String FILE_CMD = "FILE";
     private static final String CANCEL_CMD = "CANCEL";
     private static final String HELP_CMD = "HELP";
+    private static final String CANCEL_TIMER_CMD = "CANCEL TIMER";
 
     private Space space;
-    private Scanner userInput;
+    private BufferedReader userInput;
+    private boolean timerRunning;
+    private WorkTimer timer;
 
     // EFFECTS: initializes and runs the ui for a space
     public SpaceUI(Space space) {
         this.space = space;
+        timerRunning = false;
         runSpaceUI();
     }
 
@@ -40,42 +48,97 @@ public class SpaceUI {
 
         while (run) {
             displaySpaceMenu();
-            input = userInput.nextLine().toUpperCase();
 
-            if (input.equals(EXIT_CMD)) {
-                run = false;
-            } else {
-                processInput(input);
+            try {
+                input = getInput().toUpperCase();
+
+                if (input.equals(EXIT_CMD)) {
+                    run = false;
+                } else {
+                    processInput(input);
+                }
+            } catch (IOException e) {
+                System.out.println("Input stream error.");
+            } catch (InterruptedException e) {
+                timeUp();
             }
         }
     }
 
+    // EFFECTS: if timer interrupts, throws TimeUpException
+    //          or if there is an IO error, throws IOException
+    //          otherwise waits for input and returns it
+    private String getInput() throws InterruptedException, IOException {
+        while (timerRunning && !userInput.ready()) {
+            Thread.sleep(100);
+        }
+        return userInput.readLine();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: stops timer and alerts the user with a popup message, if supported by system
+    private void timeUp() {
+        System.out.println("Time's up!");
+        timerRunning = false;
+    }
+
     // MODIFIES: this
     // EFFECTS: processes a command
-    private void processInput(String input) {
+    private void processInput(String input) throws IOException, InterruptedException {
         if (input.equals(HELP_CMD)) {
             helpMenu();
-        } else if (input.length() >= OPEN_RESOURCE_CMD.length()
-                && input.substring(0, OPEN_RESOURCE_CMD.length()).equals(OPEN_RESOURCE_CMD)) {
+        } else if (input.startsWith(OPEN_RESOURCE_CMD)) {
             launchResource(input.substring(OPEN_RESOURCE_CMD.length()));
         } else if (input.equals(ADD_RESOURCE_CMD)) {
             addResource();
         } else if (input.equals(ADD_TASK_CMD)) {
             addTask();
-        } else if (input.length() >= DELETE_RESOURCE_CMD.length()
-                && input.substring(0, DELETE_RESOURCE_CMD.length()).equals(DELETE_RESOURCE_CMD)) {
+        } else if (input.startsWith(DELETE_RESOURCE_CMD)) {
             deleteResource(input.substring(DELETE_RESOURCE_CMD.length()));
-        } else if (input.length() >= DELETE_TASK_CMD.length()
-                && input.substring(0, DELETE_TASK_CMD.length()).equals(DELETE_TASK_CMD)) {
+        } else if (input.startsWith(DELETE_TASK_CMD)) {
             deleteTask(input.substring(DELETE_TASK_CMD.length()));
-        } else if (input.length() >= COMPLETE_TASK_CMD.length()
-                && input.substring(0, COMPLETE_TASK_CMD.length()).equals(COMPLETE_TASK_CMD)) {
+        } else if (input.startsWith(COMPLETE_TASK_CMD)) {
             processDoneCommand(input.substring(COMPLETE_TASK_CMD.length()));
         } else if (input.equals(OPEN_ALL_CMD)) {
-            space.launchAllResources();
+            ResourceLauncher.launch(space.getResources());
+        } else if (input.startsWith(START_TIMER_CMD)) {
+            startTimer(input.substring(START_TIMER_CMD.length()));
+        } else if (input.equals(CANCEL_TIMER_CMD)) {
+            cancelTimer();
         } else {
             invalidCommand();
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
+    private void cancelTimer() {
+        if (timerRunning) {
+            timer.cancelTimer();
+        }
+        timerRunning = false;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: starts a new timer thread
+    private void startTimer(String input) {
+        int mins;
+        try {
+            mins = getIntFromInput(input);
+        } catch (Exception e) {
+            invalidCommand();
+            return;
+        }
+
+        if (mins < 0) {
+            System.out.println("Timer length cannot be negative.");
+            return;
+        }
+
+        Thread.currentThread().setName(space.getName());
+        timer = new WorkTimer(mins, Thread.currentThread());
+        timer.run();
+        timerRunning = true;
     }
 
     // MODIFIES: this
@@ -83,7 +146,7 @@ public class SpaceUI {
     private void processDoneCommand(String input) {
         int index;
         try {
-            index = getIntFromInput(input);
+            index = getIntFromInput(input) - 1;
         } catch (Exception e) {
             invalidCommand();
             return;
@@ -101,7 +164,7 @@ public class SpaceUI {
     private void deleteResource(String input) {
         int index;
         try {
-            index = getIntFromInput(input);
+            index = getIntFromInput(input) - 1;
         } catch (Exception e) {
             System.out.println("Missing resource index.");
             return;
@@ -119,7 +182,7 @@ public class SpaceUI {
     private void deleteTask(String input) {
         int index;
         try {
-            index = getIntFromInput(input);
+            index = getIntFromInput(input) - 1;
         } catch (Exception e) {
             System.out.println("Missing task index.");
             return;
@@ -134,19 +197,18 @@ public class SpaceUI {
 
     // MODIFIES: this
     // EFFECTS: processes user input to add a resource, adds it to space resources
-    private void addResource() {
+    private void addResource() throws IOException, InterruptedException {
         Resource newResource;
 
         System.out.println("What type of resource to add? (enter \"" + LINK_CMD + "\",\"" + FILE_CMD
                 + "\",\"" + APP_CMD + "\", or enter anything else to cancel)");
-        String type = userInput.next().toUpperCase();
-        userInput.nextLine();
+        String type = getInput().toUpperCase();
 
         if (type.equals(LINK_CMD) || type.equals(FILE_CMD) || type.equals(APP_CMD)) {
             System.out.println("Enter resource name.");
-            String name = userInput.nextLine();
+            String name = getInput();
             System.out.println("Enter resource (ie. website link, path to file, or path to executable)");
-            String path = userInput.nextLine();
+            String path = getInput();
 
             try {
                 if (type.equals(LINK_CMD)) {
@@ -165,13 +227,12 @@ public class SpaceUI {
 
     // MODIFIES: this
     // EFFECTS: processes user input to add a task, adds it to space to-do list
-    private void addTask() {
+    private void addTask() throws IOException {
         System.out.println("Enter new task (or enter \"" + CANCEL_CMD + "\" to cancel).");
-        String input = userInput.nextLine();
+        String input;
+        input = userInput.readLine();
 
-        if (input.equals(CANCEL_CMD)) {
-            return;
-        } else {
+        if (!input.equals(CANCEL_CMD)) {
             space.getTodo().addTask(new Task(input));
         }
     }
@@ -179,35 +240,31 @@ public class SpaceUI {
     // EFFECTS: if input string is an int, ignoring white spaces, returns int
     public int getIntFromInput(String input) throws NumberFormatException {
         input = input.replaceAll("\\s+", "");
-        return Integer.parseInt(input) - 1;
+        return Integer.parseInt(input);
     }
 
-    // EFFECTS: returns true if input is valid resource number, and resource is successfully launched
-    // otherwise returns false and outputs error message
-    private boolean launchResource(String input) {
+    // EFFECTS: if input is valid resource number, attempts to launch resource, otherwise outputs error message
+    private void launchResource(String input) {
         int resourceNumber;
 
         try {
-            resourceNumber = getIntFromInput(input);
+            resourceNumber = getIntFromInput(input) - 1;
         } catch (Exception e) {
             System.out.println("Invalid resource number.");
-            return false;
+            return;
         }
 
         if (resourceNumber < 0 || resourceNumber > space.getResources().size()) {
             System.out.println("Invalid resource number.");
-            return false;
+            return;
         }
 
-        if (!(space.launchResource(resourceNumber))) {
-            System.out.println("The resource failed to launch.");
-        }
-        return true;
+        ResourceLauncher.launch(space.getResources().get(resourceNumber));
     }
 
     // EFFECTS: initializes space
     private void init() {
-        userInput = new Scanner(System.in);
+        userInput = new BufferedReader(new InputStreamReader(System.in));
     }
 
     // EFFECTS: displays all space info
@@ -217,10 +274,17 @@ public class SpaceUI {
         System.out.println();
         displayResources();
         displayTodo();
-        // timer
+        displayTimer();
 
         System.out.println("Enter " + EXIT_CMD + " to exit this space.");
         System.out.println("Enter " + HELP_CMD + " to see all commands.");
+    }
+
+    // EFFECTS: if timer is started, displays time, otherwise does nothing
+    private void displayTimer() {
+        if (timerRunning) {
+            System.out.println("Work time left: " + timer.getTime());
+        }
     }
 
     // EFFECTS: if this space has resources, displays them in a numbered table
