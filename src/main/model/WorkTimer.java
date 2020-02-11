@@ -4,6 +4,8 @@ import ui.platformspecific.SystemTrayTool;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,7 +30,14 @@ public class WorkTimer implements Runnable {
         this.updateDelay = UPDATE_DELAY;
 
         ClassLoader classLoader = this.getClass().getClassLoader();
-        Image taskBarIcon = new ImageIcon(classLoader.getResource("timer.png")).getImage();
+        URL imageUrl = classLoader.getResource("timer.png");
+        Image taskBarIcon;
+        if (imageUrl == null) {
+            // creates empty image if icon is not found
+            taskBarIcon = new BufferedImage(10,10, 1);
+        } else {
+            taskBarIcon = new ImageIcon(imageUrl).getImage();
+        }
         systemTrayTool = new SystemTrayTool(taskBarIcon);
     }
 
