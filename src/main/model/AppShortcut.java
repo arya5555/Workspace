@@ -5,7 +5,7 @@ import java.nio.file.NoSuchFileException;
 // represents an app with a name and File object which is an executable
 public class AppShortcut extends FilePath {
 
-    // EFFECTS: creates new app shortcut with given name and path, throws exception if path does not lead
+    // EFFECTS: creates new AppShortcut with given name and path, throws exception if path does not lead
     // to an executable file
     public AppShortcut(String name, String path) throws NoSuchFileException {
         this.name = name;
