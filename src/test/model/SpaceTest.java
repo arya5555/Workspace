@@ -1,7 +1,10 @@
 package model;
 
+import model.exception.FailedToOpenException;
+import model.exception.SystemNotSupportedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import platformspecific.ResourceLauncher;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,7 +34,7 @@ public class SpaceTest {
     @Test
     public void testConstructor() {
         assertEquals("MATH", space.getName());
-        assertEquals(0, space.getResources().size());
+        assertEquals(0, space.numResources());
         assertEquals(0, space.getTodo().getNumToDos());
         assertFalse(space.isTimerRunning());
     }
@@ -86,7 +89,7 @@ public class SpaceTest {
 
         space.removeResource(1);
 
-        assertEquals(1, space.getResources().size());
+        assertEquals(1, space.numResources());
         assertTrue(space.getResources().contains(textbookLink));
     }
 
@@ -99,5 +102,51 @@ public class SpaceTest {
         assertEquals(2, resourceNames.size());
         assertTrue(resourceNames.contains("Textbook"));
         assertTrue(resourceNames.contains("Google"));
+    }
+
+    @Test
+    public void testLaunchAllResources() {
+        boolean successfulLaunch = true;
+
+        space.addResource(textbookLink);
+        space.addResource(googleLink);
+
+        try {
+            space.launchAllResources();
+        } catch (Exception e) {
+            successfulLaunch = false;
+        } finally {
+            assertEquals(ResourceLauncher.isDesktopSupported(), successfulLaunch);
+        }
+    }
+
+    @Test
+    public void testLaunchResource() {
+        boolean successfulLaunch = true;
+
+        space.addResource(textbookLink);
+
+        try {
+            space.launchResource(0);
+        } catch (Exception e) {
+            successfulLaunch = false;
+        } finally {
+            assertEquals(ResourceLauncher.isDesktopSupported(), successfulLaunch);
+        }
+    }
+
+    @Test
+    public void testLaunchInvalidResource() {
+        boolean successfulLaunch = true;
+
+        space.addResource(textbookLink);
+
+        try {
+            space.launchResource(4);
+        } catch (Exception e) {
+            successfulLaunch = false;
+        } finally {
+            assertFalse(successfulLaunch);
+        }
     }
 }

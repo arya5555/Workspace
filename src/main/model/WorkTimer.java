@@ -1,6 +1,7 @@
 package model;
 
-import ui.platformspecific.SystemTrayTool;
+import model.exception.SystemNotSupportedException;
+import platformspecific.SystemTrayTool;
 
 import java.awt.*;
 import java.util.Timer;
@@ -15,6 +16,7 @@ public class WorkTimer implements Runnable {
     private Thread callingThread;
     private SystemTrayTool systemTrayTool;
     private int updateDelay;
+    private boolean traySupported;
     private Image icon;
 
     // EFFECTS: creates new timer with given time in minutes
@@ -31,7 +33,13 @@ public class WorkTimer implements Runnable {
     // EFFECTS: runs the timer
     @Override
     public void run() {
-        systemTrayTool = new SystemTrayTool(icon);
+        try {
+            systemTrayTool = new SystemTrayTool(icon);
+            traySupported = true;
+        } catch (SystemNotSupportedException e) {
+            traySupported = false;
+        }
+
         timer.scheduleAtFixedRate(task, updateDelay, updateDelay);
     }
 
@@ -56,16 +64,22 @@ public class WorkTimer implements Runnable {
     private void timeUp() {
         timer.cancel();
         callingThread.interrupt();
-        systemTrayTool.showPopup("Time's up!", "Your work timer in "
-                + callingThread.getName() + " is finished.");
-        systemTrayTool.deleteTrayIcon();
+
+        if (traySupported) {
+            systemTrayTool.showPopup("Time's up!", "Your work timer in "
+                    + callingThread.getName() + " is finished.");
+            systemTrayTool.deleteTrayIcon();
+        }
     }
 
     // MODIFIES: this
     // EFFECTS: cancels timer without notifications
     public void cancelTimer() {
         timer.cancel();
-        systemTrayTool.deleteTrayIcon();
+
+        if (traySupported) {
+            systemTrayTool.deleteTrayIcon();
+        }
     }
 
     // MODIFIES: this
@@ -95,7 +109,9 @@ public class WorkTimer implements Runnable {
                 seconds--;
             }
 
-            systemTrayTool.changeTooltip(callingThread.getName() + " " + getTime());
+            if (traySupported) {
+                systemTrayTool.changeTooltip(callingThread.getName() + " " + getTime());
+            }
         }
     }
 }

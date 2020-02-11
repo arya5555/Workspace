@@ -1,7 +1,10 @@
 package ui;
 
 import model.*;
-import ui.platformspecific.ResourceLauncher;
+import model.exception.FailedToOpenException;
+import model.exception.IndexOutOfBoundsException;
+import model.exception.SystemNotSupportedException;
+import platformspecific.ResourceLauncher;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -102,13 +105,24 @@ public class SpaceUI {
         } else if (input.startsWith(COMPLETE_TASK_CMD)) {
             processDoneCommand(input.substring(COMPLETE_TASK_CMD.length()));
         } else if (input.equals(OPEN_ALL_CMD)) {
-            ResourceLauncher.launch(space.getResources());
+            launchAllResources();
         } else if (input.startsWith(START_TIMER_CMD)) {
             startTimer(input.substring(START_TIMER_CMD.length()));
         } else if (input.equals(CANCEL_TIMER_CMD)) {
             space.cancelTimer();
         } else {
             invalidCommand();
+        }
+    }
+
+    // EFFECTS: attempts to launch all resources, outputs errors if there are exceptions
+    private void launchAllResources() {
+        try {
+            space.launchAllResources();
+        } catch (SystemNotSupportedException e) {
+            System.out.println("System does not support launching one or more resources.");
+        } catch (FailedToOpenException e) {
+            System.out.println("One or more resources failed to launch.");
         }
     }
 
@@ -247,16 +261,19 @@ public class SpaceUI {
         try {
             resourceNumber = getIntFromInput(input) - 1;
         } catch (Exception e) {
-            System.out.println("Invalid resource number.");
+            System.out.println("You must input a resource number.");
             return;
         }
 
-        if (resourceNumber < 0 || resourceNumber > space.getResources().size()) {
-            System.out.println("Invalid resource number.");
-            return;
+        try {
+            space.launchResource(resourceNumber);
+        } catch (SystemNotSupportedException e) {
+            System.out.println("System does not support launching one or more resources.");
+        } catch (FailedToOpenException e) {
+            System.out.println("One or more resources failed to launch.");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Invalid resource index.");
         }
-
-        ResourceLauncher.launch(space.getResources().get(resourceNumber));
     }
 
     // EFFECTS: initializes space

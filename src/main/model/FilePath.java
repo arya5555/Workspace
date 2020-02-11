@@ -1,5 +1,9 @@
 package model;
 
+import model.exception.FailedToOpenException;
+import model.exception.SystemNotSupportedException;
+import platformspecific.ResourceLauncher;
+
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
@@ -10,7 +14,8 @@ public class FilePath implements Resource {
     protected File file;
 
     // EFFECTS: initializes empty, unnamed FilePath object
-    public FilePath() {
+    //          only to be used by AppShortcut subclass
+    protected FilePath() {
         this.name = "";
         this.file = null;
     }
@@ -19,6 +24,13 @@ public class FilePath implements Resource {
     public FilePath(String name, String path) throws NoSuchFileException {
         this.name = name;
         setPath(path);
+    }
+
+    // EFFECTS: if system does not support opening files, throws SystemNotSupportedException
+    //          if files no longer exists or fails to open, throws FailedToOpenException
+    //          otherwise, opens file in default application
+    public void launch() throws SystemNotSupportedException, FailedToOpenException {
+        ResourceLauncher.openFile(file);
     }
 
     // EFFECTS: returns file's extension

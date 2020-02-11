@@ -1,5 +1,9 @@
 package model;
 
+import model.exception.FailedToOpenException;
+import model.exception.SystemNotSupportedException;
+import platformspecific.ResourceLauncher;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,6 +27,13 @@ public class WebsiteLink implements Resource {
                         '!','$','&','\'','(',')','*','+',',',';','%','='));
         this.name = name;
         setPath(url);
+    }
+
+    // EFFECTS: if system does not support launching websites, throws SystemNotSupportedException
+    //          if website fails to launch, throws FailedToOpenException
+    //          otherwise, opens url in default browser
+    public void launch() throws SystemNotSupportedException, FailedToOpenException {
+        ResourceLauncher.openSite(url);
     }
 
     //getters

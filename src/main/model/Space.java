@@ -1,8 +1,10 @@
 package model;
 
-import javax.imageio.ImageIO;
+import model.exception.FailedToOpenException;
+import model.exception.IndexOutOfBoundsException;
+import model.exception.SystemNotSupportedException;
+
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +60,30 @@ public class Space {
         return names;
     }
 
+
+    // EFFECTS: attempts to launch resource with given index
+    //          if index is out of bounds, throws IndexOutOfBoundsException
+    //          if system does not support launching this resource, throws SystemNotSupportedException
+    //          if resource fails to launch, throws FailedToOpenException
+    //          otherwise, opens resource in appropriate application
+    public void launchResource(int index) throws SystemNotSupportedException, FailedToOpenException,
+            IndexOutOfBoundsException {
+        if (index >= 0 && index < numResources()) {
+            resources.get(index).launch();
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    // EFFECTS: if system does not support launching this resource, throws SystemNotSupportedException
+    //          if resource fails to launch, throws FailedToOpenException
+    //          otherwise, opens resource in appropriate application
+    public void launchAllResources() throws SystemNotSupportedException, FailedToOpenException {
+        for (Resource r: resources) {
+            r.launch();
+        }
+    }
+
     // MODIFIES: this
     // EFFECTS: cancels a timer if it is currently running, otherwise does nothing
     public void cancelTimer() {
@@ -104,5 +130,9 @@ public class Space {
 
     public boolean isTimerRunning() {
         return timerRunning;
+    }
+
+    public int numResources() {
+        return resources.size();
     }
 }

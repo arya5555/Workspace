@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import platformspecific.ResourceLauncher;
 
 import java.awt.*;
 import java.io.File;
@@ -76,6 +77,18 @@ class FilePathTest {
                     new FilePath("Directory", testFile.getParentFile().getPath()).getFileExtension());
         } catch (Exception e) {
             fail();
+        }
+    }
+
+    @Test
+    public void testOpenFile() {
+        boolean successful = true;
+        try {
+            filePath.launch();
+        } catch (Exception e) {
+            successful = false;
+        } finally {
+            assertEquals(ResourceLauncher.isDesktopSupported(), successful);
         }
     }
 }

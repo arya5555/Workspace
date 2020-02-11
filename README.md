@@ -50,6 +50,5 @@ distraction
 - As a user, I want to be able to open my resources (links, files, apps) in an external program
 - As a user, I want to be able to start a timer for time to work in a space
 - As a user, I want to be able to add more time to a timer
-- As a user, I want to be able to set a break timer after a work timer
 - As a user, I want to be able to add a task to a to-do list within a space
 - As a user, I want to be able to mark a task as complete or delete it from a space
