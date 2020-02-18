@@ -12,7 +12,6 @@ import java.util.List;
 
 // represents a website with a name and URL
 public class WebsiteLink implements Resource {
-    public static final String WEBSITE_RESOURCE_TYPE = "WEBSITE";
     private static List<Character> VALID_URL_CHARS;
     private String name;
     private URL url;
@@ -21,7 +20,7 @@ public class WebsiteLink implements Resource {
 
     // source for valid url characters:
     // https://stackoverflow.com/questions/1547899/which-characters-make-a-url-invalid/1547940#1547940
-    public WebsiteLink(String name, String url) throws Exception {
+    public WebsiteLink(String name, String url) throws MalformedURLException {
         VALID_URL_CHARS = new ArrayList<>(
                 Arrays.asList('-','.','~','_',':','/','?','#','[',']','@',
                         '!','$','&','\'','(',')','*','+',',',';','%','='));
@@ -48,8 +47,8 @@ public class WebsiteLink implements Resource {
     }
 
     @Override
-    public String getResourceType() {
-        return WEBSITE_RESOURCE_TYPE;
+    public ResourceType getResourceType() {
+        return ResourceType.LINK;
     }
 
     //setters

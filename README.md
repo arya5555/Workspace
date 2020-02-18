@@ -49,6 +49,7 @@ distraction
 (for an application, this means adding the path to an executable file)
 - As a user, I want to be able to open my resources (links, files, apps) in an external program
 - As a user, I want to be able to start a timer for time to work in a space
-- As a user, I want to be able to add more time to a timer
 - As a user, I want to be able to add a task to a to-do list within a space
 - As a user, I want to be able to mark a task as complete or delete it from a space
+- As a user, I want to be able to save all of the information in my spaces when I quit the application
+- As a user, I want my previously saved space data to be automatically loaded when I open the application

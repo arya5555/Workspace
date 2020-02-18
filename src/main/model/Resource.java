@@ -4,8 +4,15 @@ import model.exception.FailedToOpenException;
 import model.exception.SystemNotSupportedException;
 
 import java.net.MalformedURLException;
+import java.nio.file.NoSuchFileException;
 
 public interface Resource {
+
+    public enum ResourceType {
+        LINK,
+        FILE,
+        APP
+    }
 
     // EFFECTS: attempts to launch resource
     //          if system does not support launching this resource, throws SystemNotSupportedException
@@ -18,8 +25,8 @@ public interface Resource {
 
     public String getPath();
 
-    public String getResourceType();
+    public ResourceType getResourceType();
 
     //setters
-    public void setPath(String path) throws Exception;
+    public void setPath(String path) throws MalformedURLException, NoSuchFileException;
 }

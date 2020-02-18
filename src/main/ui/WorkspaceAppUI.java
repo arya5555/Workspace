@@ -2,7 +2,12 @@ package ui;
 
 import model.Space;
 import model.WorkspaceApp;
+import model.exception.InvalidFormatException;
+import persistence.Reader;
+import persistence.Writer;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +15,7 @@ import java.util.Scanner;
 
 // Command line UI for Workspace application
 public class WorkspaceAppUI {
+    private static final String WORKSPACE_FILE = "./data/spaces.json";
     private static final String ADD_SPACE_CMD = "ADD";
     private static final String DELETE_SPACE_CMD = "DEL";
     private static final String EXIT_CMD = "EXIT";
@@ -32,13 +38,13 @@ public class WorkspaceAppUI {
     // EFFECTS: displays main menu & processes user input
     private void runWorkspaceAppUI() {
         boolean run = true;
-        String input = null;
+        String input;
 
         init();
         System.out.println("Welcome to your Workspace.");
         while (run) {
             displayMenu();
-            input = userInput.next().toUpperCase();
+            input = userInput.nextLine().toUpperCase();
 
             if (input.equals("EXIT")) {
                 run = false;
@@ -46,11 +52,45 @@ public class WorkspaceAppUI {
                 processInput(input);
             }
         }
+
+        saveSpaces();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads spaces from WORKSPACE_FILE, if that file exists;
+    // otherwise does nothing
+    private void loadSpaces() throws IOException, InvalidFormatException {
+        List<Space> spaces = Reader.readSpaces(new File(WORKSPACE_FILE));
+        for (Space s : spaces) {
+            workspace.addSpace(s);
+        }
+    }
+
+    // EFFECTS: saves state of all spaces in workspace to WORKSPACE_FILE
+    private void saveSpaces() {
+        try {
+            Writer writer = new Writer(new File(WORKSPACE_FILE));
+            writer.write(workspace);
+            writer.close();
+            System.out.println("Space data saved to file " + WORKSPACE_FILE);
+        } catch (IOException e) {
+            System.out.println("File error: Unable to save to " + WORKSPACE_FILE);
+        }
     }
 
     // EFFECTS: initializes workspace
     private void init() {
         userInput = new Scanner(System.in);
+        try {
+            loadSpaces();
+        } catch (IOException e) {
+            System.out.println("Could not find previous save file " + WORKSPACE_FILE);
+            System.out.println("No saved spaces were loaded.");
+        } catch (InvalidFormatException e) {
+            System.out.println("Save file " + WORKSPACE_FILE
+                    + " was found, but contents were not in the correct format");
+            System.out.println("No saved spaces were loaded.");
+        }
     }
 
     // EFFECTS: display options
@@ -97,7 +137,7 @@ public class WorkspaceAppUI {
 
         while (run) {
             System.out.println("Enter the name of your new space (or enter \"" + CANCEL_CMD + "\" to cancel)");
-            input = userInput.next().toUpperCase();
+            input = userInput.nextLine().toUpperCase();
 
             if (input.equals(CANCEL_CMD)) {
                 run = false;
@@ -121,7 +161,7 @@ public class WorkspaceAppUI {
 
         while (run) {
             System.out.println("Enter name of space to delete (or enter \"" + CANCEL_CMD + "\" to cancel).");
-            input = userInput.next().toUpperCase();
+            input = userInput.nextLine().toUpperCase();
 
             if (input.equals(CANCEL_CMD)) {
                 run = false;
@@ -130,7 +170,7 @@ public class WorkspaceAppUI {
                 System.out.println("Are you sure you want to delete " + spaceName + " space?");
                 System.out.println("Enter \"" + CONFIRM_CMD + "\" to continue, or enter anything else to cancel.");
 
-                input = userInput.next().toUpperCase();
+                input = userInput.nextLine().toUpperCase();
 
                 if (input.equals(CONFIRM_CMD)) {
                     workspace.removeSpace(spaceName);

@@ -1,5 +1,8 @@
 package model;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,5 +59,18 @@ public class ToDoList {
     // getters
     public List<Task> getTasks() {
         return tasks;
+    }
+
+    // EFFECTS: returns a JSON array containing all tasks in to-do list
+    public JSONArray getListAsJson() {
+        JSONArray tasksList = new JSONArray();
+        for (Task t : tasks) {
+            JSONObject taskDetails = new JSONObject();
+            taskDetails.put("description", t.getDescription());
+            taskDetails.put("complete?", t.getComplete());
+            tasksList.add(taskDetails);
+        }
+
+        return tasksList;
     }
 }

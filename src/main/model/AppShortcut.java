@@ -23,4 +23,9 @@ public class AppShortcut extends FilePath {
             throw new NoSuchFileException(path);
         }
     }
+
+    @Override
+    public ResourceType getResourceType() {
+        return ResourceType.APP;
+    }
 }

@@ -5,10 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import platformspecific.ResourceLauncher;
 
-import java.awt.*;
 import java.io.File;
 
-import static model.FilePath.FILE_RESOURCE_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilePathTest {
@@ -47,7 +45,7 @@ class FilePathTest {
     public void testConstructor() {
         assertEquals("TestFile", filePath.getName());
         assertEquals(testFile.getPath(), filePath.getPath());
-        assertEquals(FILE_RESOURCE_TYPE, filePath.getResourceType());
+        assertEquals(Resource.ResourceType.FILE, filePath.getResourceType());
     }
 
     @Test

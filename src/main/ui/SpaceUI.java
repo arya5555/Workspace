@@ -117,15 +117,15 @@ public class SpaceUI {
 
     // EFFECTS: displays all commands
     private void helpMenu() {
-        System.out.println("To open a resource, enter \"" + OPEN_RESOURCE_CMD + " <resource number>\"");
-        System.out.println("To open all resources, enter \"" + OPEN_RESOURCE_CMD + " " + OPEN_ALL_CMD + "\"");
-        System.out.println("To add a resource, enter \"" + ADD_RESOURCE_CMD + "\"");
-        System.out.println("To delete a resource, enter \"" + DELETE_RESOURCE_CMD + " <resource number>\"");
-        System.out.println("To complete a task, enter \"" + COMPLETE_TASK_CMD + " <task number>\"");
-        System.out.println("To add a task, enter \"" + ADD_TASK_CMD + "\"");
-        System.out.println("To delete a task, enter \"" + DELETE_TASK_CMD + " <task number>\"");
-        System.out.println("To start a timer, enter \"" + START_TIMER_CMD + " <# of minutes>\"");
-        System.out.println("To cancel a timer, enter \"" + CANCEL_TIMER_CMD + "\"");
+        System.out.println("\"" + OPEN_RESOURCE_CMD + " <resource number>\" - Open a resource");
+        System.out.println("\"" + OPEN_ALL_CMD + "\" - Open all resources");
+        System.out.println("\"" + ADD_RESOURCE_CMD + "\" - Add a resource");
+        System.out.println("\"" + DELETE_RESOURCE_CMD + " <resource number>\" - Delete a resource");
+        System.out.println("\"" + COMPLETE_TASK_CMD + " <task number>\" - Complete a task");
+        System.out.println("\"" + ADD_TASK_CMD + "\" - Add a task");
+        System.out.println("\"" + DELETE_TASK_CMD + " <task number>\" - Delete a task");
+        System.out.println("\"" + START_TIMER_CMD + " <# of minutes>\" - Start a timer");
+        System.out.println("\"" + CANCEL_TIMER_CMD + "\" - Cancel a timer");
     }
 
     // EFFECTS: if timer interrupts, throws TimeUpException

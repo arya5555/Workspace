@@ -134,4 +134,14 @@ public class Space {
     public int numResources() {
         return resources.size();
     }
+
+    //setters
+    public void setResources(List<Resource> resources) {
+        this.resources = resources;
+    }
+
+    //setters
+    public void setTodo(ToDoList todo) {
+        this.todo = todo;
+    }
 }

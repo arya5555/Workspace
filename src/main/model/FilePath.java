@@ -9,7 +9,6 @@ import java.nio.file.NoSuchFileException;
 
 // represents a file with a name and a File object
 public class FilePath implements Resource {
-    public static final String FILE_RESOURCE_TYPE = "FILE";
     protected String name;
     protected File file;
 
@@ -69,7 +68,7 @@ public class FilePath implements Resource {
     }
 
     @Override
-    public String getResourceType() {
-        return FILE_RESOURCE_TYPE;
+    public ResourceType getResourceType() {
+        return ResourceType.FILE;
     }
 }

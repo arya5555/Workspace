@@ -3,8 +3,6 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static model.WebsiteLink.WEBSITE_RESOURCE_TYPE;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class WebsiteLinkTest {
@@ -23,7 +21,7 @@ class WebsiteLinkTest {
     public void testConstructor() {
         assertEquals("Canvas", websiteLink.getName());
         assertEquals("https://canvas.ubc.ca/", websiteLink.getPath());
-        assertEquals(WEBSITE_RESOURCE_TYPE, websiteLink.getResourceType());
+        assertEquals(Resource.ResourceType.LINK, websiteLink.getResourceType());
     }
 
     @Test
