@@ -13,10 +13,14 @@ public class Writer {
         printWriter = new PrintWriter(file);
     }
 
-    // MODIFIES: this
     // EFFECTS: writes saveable to file
     public void write(Saveable saveable) {
         saveable.save(printWriter);
+    }
+
+    // EFFECTS: writes given string to file
+    public void write(String string) {
+        printWriter.write(string);
     }
 
     // MODIFIES: this

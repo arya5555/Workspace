@@ -6,13 +6,11 @@ import platformspecific.ResourceLauncher;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 // represents a website with a name and URL
 public class WebsiteLink implements Resource {
-    private static List<Character> VALID_URL_CHARS;
+    private static Set<Character> VALID_URL_CHARS;
     private String name;
     private URL url;
 
@@ -21,7 +19,7 @@ public class WebsiteLink implements Resource {
     // source for valid url characters:
     // https://stackoverflow.com/questions/1547899/which-characters-make-a-url-invalid/1547940#1547940
     public WebsiteLink(String name, String url) throws MalformedURLException {
-        VALID_URL_CHARS = new ArrayList<>(
+        VALID_URL_CHARS = new HashSet<>(
                 Arrays.asList('-','.','~','_',':','/','?','#','[',']','@',
                         '!','$','&','\'','(',')','*','+',',',';','%','='));
         this.name = name;

@@ -42,7 +42,7 @@ public class Reader {
     //          if file can't be found, throws IOException
     //          if file is not in correct JSON format, throws InvalidFormatException
     // source for reading from JSON file: https://howtodoinjava.com/library/json-simple-read-write-json-examples/
-    private static JSONArray readFile(File file) throws IOException, ParseException {
+    public static JSONArray readFile(File file) throws IOException, ParseException {
         FileReader fileReader = new FileReader(file);
         JSONParser parser = new JSONParser();
         Object contentObject = parser.parse(fileReader);

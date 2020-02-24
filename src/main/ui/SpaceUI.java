@@ -143,6 +143,8 @@ public class SpaceUI {
     private void processInput(String input) throws IOException, InterruptedException {
         if (input.equals(HELP_CMD)) {
             helpMenu();
+        } else if (input.equals(OPEN_ALL_CMD)) {
+            launchAllResources();
         } else if (input.startsWith(OPEN_RESOURCE_CMD)) {
             launchResource(input.substring(OPEN_RESOURCE_CMD.length()));
         } else if (input.equals(ADD_RESOURCE_CMD)) {
@@ -155,8 +157,6 @@ public class SpaceUI {
             deleteTask(input.substring(DELETE_TASK_CMD.length()));
         } else if (input.startsWith(COMPLETE_TASK_CMD)) {
             processDoneCommand(input.substring(COMPLETE_TASK_CMD.length()));
-        } else if (input.equals(OPEN_ALL_CMD)) {
-            launchAllResources();
         } else if (input.startsWith(START_TIMER_CMD)) {
             startTimer(input.substring(START_TIMER_CMD.length()));
         } else if (input.equals(CANCEL_TIMER_CMD)) {

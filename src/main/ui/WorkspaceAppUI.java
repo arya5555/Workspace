@@ -1,17 +1,20 @@
 package ui;
 
+import model.Account;
 import model.Space;
 import model.WorkspaceApp;
-import model.exception.InvalidFormatException;
+import model.exception.*;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.ParseException;
+import org.junit.internal.runners.statements.Fail;
 import persistence.Reader;
 import persistence.Writer;
+import tools.DatabaseTool;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.sql.SQLException;
+import java.util.*;
 
 // Command line UI for Workspace application
 public class WorkspaceAppUI {
@@ -21,7 +24,13 @@ public class WorkspaceAppUI {
     private static final String EXIT_CMD = "EXIT";
     private static final String CANCEL_CMD = "CANCEL";
     private static final String CONFIRM_CMD = "YES";
-    private static List<String> COMMANDS;
+    private static final String BACKUP_CMD = "BACKUP";
+    private static final String RESTORE_CMD = "RESTORE";
+    private static final String HELP_CMD = "HELP";
+    private static final String SIGN_IN_CMD = "LOGIN";
+    private static final String SIGN_UP_CMD = "NEW";
+
+    private static Set<String> COMMANDS;
 
     WorkspaceApp workspace;
     private Scanner userInput;
@@ -29,8 +38,9 @@ public class WorkspaceAppUI {
     // EFFECTS: initializes and runs the workspace application
     public WorkspaceAppUI() {
         workspace = new WorkspaceApp();
-        COMMANDS = new ArrayList<>(
-                Arrays.asList(ADD_SPACE_CMD, DELETE_SPACE_CMD, EXIT_CMD, CANCEL_CMD, CONFIRM_CMD));
+        COMMANDS = new HashSet<>(
+                Arrays.asList(ADD_SPACE_CMD, DELETE_SPACE_CMD, EXIT_CMD, CANCEL_CMD, CONFIRM_CMD,
+                        BACKUP_CMD, RESTORE_CMD, HELP_CMD));
         runWorkspaceAppUI();
     }
 
@@ -97,9 +107,7 @@ public class WorkspaceAppUI {
     private void displayMenu() {
         System.out.println("");
         listSpaces();
-        System.out.println("Input \"" + ADD_SPACE_CMD + "\" to create a new space.");
-        System.out.println("Input \"" + DELETE_SPACE_CMD + "\" to delete a space.");
-        System.out.println("Input \"" + EXIT_CMD + "\" to exit.");
+        System.out.println("Enter \"" + HELP_CMD + "\" to view all commands.");
     }
 
     // EFFECTS: list all of user's spaces
@@ -122,11 +130,27 @@ public class WorkspaceAppUI {
             addSpace();
         } else if (input.equals(DELETE_SPACE_CMD)) {
             deleteSpace();
+        } else if (input.equals(HELP_CMD)) {
+            helpMenu();
         } else if (workspace.getAllSpaceNames().contains(input)) {
             runSpace(workspace.getSpaceOfName(input));
+        } else if (input.equals(BACKUP_CMD)) {
+            backupSpaceData();
+        } else if (input.equals(RESTORE_CMD)) {
+            restoreSpacesFromBackup();
+            init();
         } else {
             System.out.println("Command was not recognized.");
         }
+    }
+
+    // EFFECTS: displays all possible input commands and their purpose
+    private void helpMenu() {
+        System.out.println("\"" + ADD_SPACE_CMD + "\": Create a new space.");
+        System.out.println("\"" + DELETE_SPACE_CMD + "\": Delete a space.");
+        System.out.println("\"" + EXIT_CMD + "\": Exit app and save data locally.");
+        System.out.println("\"" + RESTORE_CMD + "\": Restore app data backed up with an account.");
+        System.out.println("\"" + BACKUP_CMD + "\": Backup app data to an account.");
     }
 
     // MODIFIES: this
@@ -188,6 +212,119 @@ public class WorkspaceAppUI {
     // EFFECTS: returns true if name is not an existing space name and not a command keyword, otherwise returns false
     private boolean checkValidSpaceName(String name) {
         return (!(COMMANDS.contains(name)) && !(workspace.getAllSpaceNames().contains(name)));
+    }
+
+    // EFFECTS: processes input to either sign into an account or create a new account
+    //          returns the account, or throws FailedToGetAccountException
+    private Account getAccount() throws FailedToGetAccountException {
+        System.out.println("Enter \"" + SIGN_IN_CMD + "\" to sign in to an existing account, \""
+                + SIGN_UP_CMD + "\" to create a new account, or anything else to cancel.");
+        String input = userInput.nextLine().toUpperCase();
+
+        if (input.equals(SIGN_IN_CMD)) {
+            return accountSignIn();
+        } else if (input.equals(SIGN_UP_CMD)) {
+            return newAccount();
+        } else {
+            throw new FailedToGetAccountException();
+        }
+    }
+
+    // EFFECTS: gets input to sign into account and returns account
+    //          if username and password are not valid, throws InvalidAccountException
+    //          throws SQLException if connection to SQL database fails
+    private Account accountSignIn() throws FailedToGetAccountException {
+        System.out.println("Enter username:");
+        String username = userInput.nextLine();
+        System.out.println("Enter password:");
+        String password = userInput.nextLine();
+
+        try {
+            DatabaseTool databaseTool = new DatabaseTool();
+            return databaseTool.signIn(username, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error reaching database. Could not sign in.");
+            throw new FailedToGetAccountException();
+        } catch (InvalidAccountException e) {
+            System.out.println("Username and password did not match. Could not sign in.");
+            throw new FailedToGetAccountException();
+        }
+    }
+
+    // EFFECTS: gets input and creates a new account, which is returned
+    //          throws SQLException if there is an error connecting to database
+    private Account newAccount() throws FailedToGetAccountException {
+        System.out.println("Enter new username:");
+        String username = userInput.nextLine();
+        System.out.println("Enter new password:");
+        String password = userInput.nextLine();
+
+        try {
+            DatabaseTool databaseTool = new DatabaseTool();
+            databaseTool.createAccount(username, password);
+            return databaseTool.signIn(username, password);
+        } catch (SQLException e) {
+            System.out.println("Error reaching database. New account was not created.");
+            throw new FailedToGetAccountException();
+        } catch (InvalidAccountException e) {
+            // programming error
+            throw new FailedToGetAccountException();
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: restores space data from online backup under account if there is one
+    private void restoreSpacesFromBackup() {
+        JSONArray backup = null;
+        Account account;
+
+        try {
+            account = getAccount();
+        } catch (FailedToGetAccountException e) {
+            return;
+        }
+
+        try {
+            DatabaseTool databaseTool = new DatabaseTool();
+            backup = databaseTool.retrieveBackup(account);
+        } catch (SQLException e) {
+            System.out.println("Failed to communicate with database to retrieve data. Data was not restored.");
+        } catch (NoBackupFoundException e) {
+            System.out.println("No backup was found for this account. Data was not restored.");
+        }
+
+        try {
+            Writer writer = new Writer(new File(WORKSPACE_FILE));
+            writer.write(backup.toString());
+            writer.close();
+            System.out.println("Data was sucessfully retrieved.");
+        } catch (IOException e) {
+            System.out.println("Failed to save retrieved data to " + WORKSPACE_FILE + ". Data was not restored.");
+        }
+    }
+
+    // EFFECTS: backs up space data to account
+    private void backupSpaceData() {
+        saveSpaces();
+
+        Account account;
+
+        try {
+            account = getAccount();
+        } catch (FailedToGetAccountException e) {
+            System.out.println("Data was not backed up.");
+            return;
+        }
+
+        try {
+            JSONArray data = Reader.readFile(new File(WORKSPACE_FILE));
+            DatabaseTool databaseTool = new DatabaseTool();
+            databaseTool.backupData(account, data);
+            System.out.println("Data successfully backed up.");
+        } catch (Exception e) {
+            System.out.println("Failed to communicate with database to backup data. Data was not backed up.");
+        }
     }
 
     // MODIFIES: this
