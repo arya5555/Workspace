@@ -45,10 +45,7 @@ public class ToDoListTest {
 
     @Test
     public void testCompleteTask() {
-        Task todo1 = new Task("Todo 1");
-        Task todo2 = new Task("Todo 2");
-        todo.addTask(todo1);
-        todo.addTask(todo2);
+        addTwoTestTasks();
         todo.completeTask(1);
 
         assertFalse(todo.getTasks().get(0).getComplete());
@@ -57,10 +54,7 @@ public class ToDoListTest {
 
     @Test
     public void testGetAllTaskDescriptions() {
-        Task todo1 = new Task("Todo 1");
-        Task todo2 = new Task("Todo 2");
-        todo.addTask(todo1);
-        todo.addTask(todo2);
+        addTwoTestTasks();
         todo.completeTask(1);
 
         List<String> descriptions = todo.getAllTaskDescriptions();
@@ -68,5 +62,22 @@ public class ToDoListTest {
         assertEquals(2, descriptions.size());
         assertEquals("Todo 1", descriptions.get(0));
         assertEquals(COMPLETED_TASK_PREFIX + "Todo 2", descriptions.get(1));
+    }
+
+    @Test
+    public void testGetListAsJSON() {
+        addTwoTestTasks();
+        todo.completeTask(1);
+        String jsonList = "[{\"complete?\":false,\"description\":\"Todo 1\"},"
+                + "{\"complete?\":true,\"description\":\"Todo 2\"}]";
+
+        assertEquals(jsonList, todo.getListAsJson().toString());
+    }
+
+    private void addTwoTestTasks() {
+        Task todo1 = new Task("Todo 1");
+        Task todo2 = new Task("Todo 2");
+        todo.addTask(todo1);
+        todo.addTask(todo2);
     }
 }

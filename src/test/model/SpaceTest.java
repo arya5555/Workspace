@@ -8,6 +8,8 @@ import platformspecific.ResourceLauncher;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +21,7 @@ public class SpaceTest {
     Space space;
     Resource textbookLink;
     Resource googleLink;
+    List<Resource> testResources;
 
     @BeforeEach
     public void setUp() {
@@ -26,9 +29,11 @@ public class SpaceTest {
         try {
             textbookLink = new WebsiteLink("Textbook", "http://www.math.ubc.ca/~CLP/CLP2/clp_2_ic/index.html");
             googleLink = new WebsiteLink("Google", "https://www.google.com/");
+            testResources = new ArrayList<>(Arrays.asList(textbookLink, googleLink));
         } catch (Exception e) {
             fail();
         }
+        space.setTodo(new ToDoList());
     }
 
     @Test
@@ -73,19 +78,7 @@ public class SpaceTest {
 
     @Test
     public void testRemoveResource() {
-        Resource textbookLink;
-        Resource googleLink;
-
-        try {
-            textbookLink = new WebsiteLink("Textbook", "http://www.math.ubc.ca/~CLP/CLP2/clp_2_ic/index.html");
-            googleLink = new WebsiteLink("Google", "https://www.google.com/");
-        } catch (Exception e) {
-            fail();
-            return;
-        }
-
-        space.addResource(textbookLink);
-        space.addResource(googleLink);
+        space.setResources(testResources);
 
         space.removeResource(1);
 
@@ -95,8 +88,7 @@ public class SpaceTest {
 
     @Test
     public void testGetAllResources() {
-        space.addResource(textbookLink);
-        space.addResource(googleLink);
+        space.setResources(testResources);
 
         List<String> resourceNames = space.getAllResourceNames();
         assertEquals(2, resourceNames.size());
@@ -108,8 +100,7 @@ public class SpaceTest {
     public void testLaunchAllResources() {
         boolean successfulLaunch = true;
 
-        space.addResource(textbookLink);
-        space.addResource(googleLink);
+        space.setResources(testResources);
 
         try {
             space.launchAllResources();

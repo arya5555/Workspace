@@ -3,6 +3,7 @@ package tools;
 import model.Account;
 import model.exception.InvalidAccountException;
 import model.exception.NoBackupFoundException;
+import model.exception.UsernameAlreadyExistsException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -47,10 +48,27 @@ public class DatabaseTool {
     }
 
     // EFFECTS: if can't connect to sql database, throws SQLException
+    //          if account with given username already exists, throw UsernameAlreadyExistsException
     //          otherwise, adds account to database with given username and password
-    public void createAccount(String userName, String password) throws SQLException {
-        statement.execute("INSERT INTO " + ACCOUNT_TABLE + " (" + ACCOUNT_USER_COLUMN + ","
-                + ACCOUNT_PASS_COLUMN + ") VALUES ('" + userName + "', '" + password + "')");
+    public void createAccount(String userName, String password) throws SQLException, UsernameAlreadyExistsException {
+        resultSet = statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                + ACCOUNT_USER_COLUMN + " = '" + userName + "'");
+
+        if (resultSet.next()) {
+            throw new UsernameAlreadyExistsException();
+        } else {
+            statement.execute("INSERT INTO " + ACCOUNT_TABLE + " (" + ACCOUNT_USER_COLUMN + ","
+                    + ACCOUNT_PASS_COLUMN + ") VALUES ('" + userName + "', '" + password + "')");
+        }
+    }
+
+    // EFFECTS: if can't connect to sql database, throws SQLException
+    //          otherwise, if account exists, deletes given account and backups
+    //          if account does not exist, does nothing
+    public void deleteAccount(Account account) throws SQLException {
+        statement.execute("DELETE FROM " + ACCOUNT_TABLE + " WHERE " + ACCOUNT_USER_COLUMN + " = '"
+                + account.getUserName() + "'");
+        deleteBackup(account);
     }
 
     // EFFECTS: if can't connect to sql database, throws SQLException
@@ -104,6 +122,9 @@ public class DatabaseTool {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: closes database connection
+    //          note: use this when done with database connection
     public void close() throws SQLException {
         statement.close();
         connection.close();

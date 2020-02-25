@@ -25,7 +25,7 @@ public class AppShortcutTest {
         try {
             appShortcut = new AppShortcut("Test App", testAppPath);
         } catch (NoSuchFileException e) {
-            fail();
+            fail("Could not find test app file " + testAppPath);
         }
     }
 
@@ -34,6 +34,13 @@ public class AppShortcutTest {
         testAppFile.delete();
         testTextFile.delete();
         testAppFile.getParentFile().delete();
+    }
+
+    @Test
+    public void testConstructor() {
+        assertEquals(testAppPath, appShortcut.getPath());
+        assertEquals("Test App", appShortcut.getName());
+        assertEquals(Resource.ResourceType.APP, appShortcut.getResourceType());
     }
 
     @Test

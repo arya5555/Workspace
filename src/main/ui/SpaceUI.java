@@ -4,7 +4,6 @@ import model.*;
 import model.exception.FailedToOpenException;
 import model.exception.IndexOutOfBoundsException;
 import model.exception.SystemNotSupportedException;
-import platformspecific.ResourceLauncher;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,7 +16,7 @@ import java.util.List;
 
 // Command line UI within a space
 public class SpaceUI {
-    private static final int TABLE_COLUMN_WIDTH = 30;
+    private static final int TABLE_COLUMN_WIDTH = 60;
     private static final String OPEN_RESOURCE_CMD = "OPEN";
     private static final String OPEN_ALL_CMD = "OPEN ALL";
     private static final String ADD_RESOURCE_CMD = "ADD RES";

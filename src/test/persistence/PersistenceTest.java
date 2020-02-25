@@ -2,12 +2,12 @@ package persistence;
 
 import model.*;
 import model.exception.InvalidFormatException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PersistenceTest {
-    private static final String TEST_DATA_FILE = "./data/test_save_data.txt";
+    private static final String TEST_DATA_FILE = "./data/test_save_data.json";
     private static final String TEST_FILE_RESOURCE = "./data/test_file.txt";
     private static final String TEST_APP_RESOURCE = "./data/test_app.exe";
     private static final String TEST_CORRUPTED_FILE = "./data/invalid_save_data.txt";
@@ -59,9 +59,25 @@ public class PersistenceTest {
             fail("No exception thrown for nonexistant file.");
         } catch (InvalidFormatException e) {
             fail("Expected IOException, but InvalidFormatException was thrown.");
-            // Expected to be thrown
         } catch (IOException e) {
             // Expected to be thrown
+        }
+    }
+
+    @Test
+    public void testWriteString() {
+        File file = new File(TEST_FILE_RESOURCE);
+        BufferedReader bufferedReader;
+
+        try {
+            bufferedReader = new BufferedReader(new FileReader(file));
+            Writer writer = new Writer(file);
+            writer.write("Test string");
+            writer.close();
+            assertEquals("Test string", bufferedReader.readLine());
+            bufferedReader.close();
+        } catch (IOException e) {
+            fail("IOException was thrown, failed to write to test file.");
         }
     }
 

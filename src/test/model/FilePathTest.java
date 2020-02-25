@@ -10,16 +10,17 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilePathTest {
-    File testFile;
-    String fileSeparator;
-    FilePath filePath;
+    private static final String TEST_FILE = "./TestDirectory/test.txt";
+    private File testFile;
+    private String fileSeparator;
+    private FilePath filePath;
 
     // source for how to create file with default file separator:
     // https://www.journaldev.com/825/java-create-new-file
     @BeforeEach
     public void setUp() {
         fileSeparator = System.getProperty("file.separator");
-        testFile = new File("TestDirectory" + fileSeparator + "test.txt");
+        testFile = new File(TEST_FILE);
 
         try {
             testFile.getParentFile().mkdirs();

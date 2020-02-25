@@ -229,8 +229,7 @@ public class WorkspaceAppUI {
     }
 
     // EFFECTS: gets input to sign into account and returns account
-    //          if username and password are not valid, throws InvalidAccountException
-    //          throws SQLException if connection to SQL database fails
+    //          if this fails, thows FailedToGetAccountException
     private Account accountSignIn() throws FailedToGetAccountException {
         System.out.println("Enter username:");
         String username = userInput.nextLine();
@@ -239,9 +238,10 @@ public class WorkspaceAppUI {
 
         try {
             DatabaseTool databaseTool = new DatabaseTool();
-            return databaseTool.signIn(username, password);
+            Account account = databaseTool.signIn(username, password);
+            databaseTool.close();
+            return account;
         } catch (SQLException e) {
-            e.printStackTrace();
             System.out.println("Error reaching database. Could not sign in.");
             throw new FailedToGetAccountException();
         } catch (InvalidAccountException e) {
@@ -251,7 +251,7 @@ public class WorkspaceAppUI {
     }
 
     // EFFECTS: gets input and creates a new account, which is returned
-    //          throws SQLException if there is an error connecting to database
+    //          throws FailedToGetAccount if there is an error connecting to database
     private Account newAccount() throws FailedToGetAccountException {
         System.out.println("Enter new username:");
         String username = userInput.nextLine();
@@ -261,13 +261,18 @@ public class WorkspaceAppUI {
         try {
             DatabaseTool databaseTool = new DatabaseTool();
             databaseTool.createAccount(username, password);
-            return databaseTool.signIn(username, password);
+            Account account = databaseTool.signIn(username, password);
+            databaseTool.close();
+            return account;
         } catch (SQLException e) {
-            System.out.println("Error reaching database. New account was not created.");
+            System.out.println("Error communicating with database. New account was not created.");
             throw new FailedToGetAccountException();
         } catch (InvalidAccountException e) {
             // programming error
             throw new FailedToGetAccountException();
+        } catch (UsernameAlreadyExistsException e) {
+            System.out.println("Username already exists. Please choose another username.");
+            return newAccount();
         }
     }
 
@@ -275,21 +280,20 @@ public class WorkspaceAppUI {
     // EFFECTS: restores space data from online backup under account if there is one
     private void restoreSpacesFromBackup() {
         JSONArray backup = null;
-        Account account;
 
         try {
-            account = getAccount();
-        } catch (FailedToGetAccountException e) {
-            return;
-        }
-
-        try {
+            Account account = getAccount();
             DatabaseTool databaseTool = new DatabaseTool();
             backup = databaseTool.retrieveBackup(account);
+            databaseTool.close();
+        } catch (FailedToGetAccountException e) {
+            return;
         } catch (SQLException e) {
             System.out.println("Failed to communicate with database to retrieve data. Data was not restored.");
+            return;
         } catch (NoBackupFoundException e) {
             System.out.println("No backup was found for this account. Data was not restored.");
+            return;
         }
 
         try {
@@ -319,6 +323,7 @@ public class WorkspaceAppUI {
             JSONArray data = Reader.readFile(new File(WORKSPACE_FILE));
             DatabaseTool databaseTool = new DatabaseTool();
             databaseTool.backupData(account, data);
+            databaseTool.close();
             System.out.println("Data successfully backed up.");
         } catch (Exception e) {
             System.out.println("Failed to communicate with database to backup data. Data was not backed up.");

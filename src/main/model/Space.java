@@ -140,7 +140,6 @@ public class Space {
         this.resources = resources;
     }
 
-    //setters
     public void setTodo(ToDoList todo) {
         this.todo = todo;
     }

@@ -76,7 +76,9 @@ public class WorkspaceApp implements Saveable {
             spacesList.add(spaceDetails);
         }
 
-        writer.write(spacesList.toJSONString());
+        String data = spacesList.toString();
+        data = data.replace("\\\\", "\\/");
+        writer.write(data);
     }
 
     //getters
