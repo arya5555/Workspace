@@ -19,7 +19,6 @@ class FilePathTest {
     // https://www.journaldev.com/825/java-create-new-file
     @BeforeEach
     public void setUp() {
-        fileSeparator = System.getProperty("file.separator");
         testFile = new File(TEST_FILE);
 
         try {

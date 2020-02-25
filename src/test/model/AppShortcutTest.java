@@ -11,34 +11,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppShortcutTest {
+    private static final String TEST_TEXT_FILE = ".\\data\\test_file.txt";
+    private static final String TEST_APP_FILE = ".\\data\\test_app.exe";
     Resource appShortcut;
     String fileSeparator;
     String testAppPath;
-    String testTextFilePath;
-    File testAppFile;
-    File testTextFile;
 
     @BeforeEach
     public void setUp(){
-        fileSeparator = System.getProperty("file.separator");
-        testAppPath = "data" + fileSeparator + "DoNothing.exe";
         try {
-            appShortcut = new AppShortcut("Test App", testAppPath);
+            appShortcut = new AppShortcut("Test App", TEST_APP_FILE);
         } catch (NoSuchFileException e) {
             fail("Could not find test app file " + testAppPath);
         }
     }
 
-    @AfterEach
-    public void deleteFiles() {
-        testAppFile.delete();
-        testTextFile.delete();
-        testAppFile.getParentFile().delete();
-    }
-
     @Test
     public void testConstructor() {
-        assertEquals(testAppPath, appShortcut.getPath());
+        assertEquals(TEST_APP_FILE, appShortcut.getPath());
         assertEquals("Test App", appShortcut.getName());
         assertEquals(Resource.ResourceType.APP, appShortcut.getResourceType());
     }
@@ -47,12 +37,12 @@ public class AppShortcutTest {
     public void testSetInvalidFile() {
         boolean failed = false;
         try {
-            appShortcut.setPath(testTextFilePath);
+            appShortcut.setPath(TEST_TEXT_FILE);
         } catch (Exception e) {
             failed = true;
         }
 
         assertTrue(failed);
-        assertEquals(testAppPath, appShortcut.getPath());
+        assertEquals(TEST_APP_FILE, appShortcut.getPath());
     }
 }
