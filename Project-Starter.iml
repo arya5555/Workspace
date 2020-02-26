@@ -39,5 +39,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="junit-platform-runner-1.6.0" level="project" />
+    <orderEntry type="library" name="junit-vintage-engine-5.6.0" level="project" />
   </component>
 </module>
