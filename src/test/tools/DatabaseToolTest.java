@@ -23,7 +23,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatabaseToolMockedTest {
+public class DatabaseToolTest {
     private static final String TEST_DATA_FILE = "./data/test_save_data.json";
     private static final String USERNAME = "testuser";
     private static final String PASSWORD = "testpass";
