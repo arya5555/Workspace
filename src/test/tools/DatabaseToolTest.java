@@ -52,7 +52,7 @@ public class DatabaseToolTest {
     private ResultSet emptyResultSet;
 
     @Before
-    public void setUpMocking() throws SQLException {
+    public void setUpMocking() {
         JSONArray testBackupData = null;
         try {
             testBackupData = Reader.readFile(new File(TEST_DATA_FILE));
@@ -60,42 +60,46 @@ public class DatabaseToolTest {
             fail("Failed to read in test data file.");
         }
 
-        when(testAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
-        when(testAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(1);
-        when(testAcctResultSet.next()).thenReturn(true);
-        when(testCorruptedAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
-        when(testCorruptedAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(2);
-        when(testCorruptedAcctResultSet.next()).thenReturn(true);
-        when(testBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn(testBackupData.toString());
-        when(testBackupResultSet.next()).thenReturn(true);
-        when(testCorruptedBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn("Invalid backup data.");
-        when(testCorruptedBackupResultSet.next()).thenReturn(true);
-        when(emptyResultSet.next()).thenReturn(false);
-
-        when(statement.execute(any(String.class))).thenReturn(true);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE " + ACCOUNT_USER_COLUMN
-                + " = '" + CORRUPTED_BACKUP_USERNAME + "'")).thenReturn(testCorruptedAcctResultSet);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                + ACCOUNT_USER_COLUMN + " = '" + NONEXISTANT_USER + "'")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN
-                        + " in(3)")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(testBackupResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(2)")).thenReturn(testCorruptedBackupResultSet);
-
         try {
-            databaseTool = new DatabaseTool(statement, connection);
-            databaseTool.createAccount(USERNAME, PASSWORD);
+            when(testAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
+            when(testAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(1);
+            when(testAcctResultSet.next()).thenReturn(true);
+            when(testCorruptedAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
+            when(testCorruptedAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(2);
+            when(testCorruptedAcctResultSet.next()).thenReturn(true);
+            when(testBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn(testBackupData.toString());
+            when(testBackupResultSet.next()).thenReturn(true);
+            when(testCorruptedBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn("Invalid backup data.");
+            when(testCorruptedBackupResultSet.next()).thenReturn(true);
+            when(emptyResultSet.next()).thenReturn(false);
+
+            when(statement.execute(any(String.class))).thenReturn(true);
             when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(testAcctResultSet);
-            testAccount = databaseTool.signIn(USERNAME, PASSWORD);
-        } catch (InvalidAccountException e) {
-            fail("Failed to sign in to test account.");
-        } catch (UsernameAlreadyExistsException e) {
-            fail("Test account shouldn't already exist.");
+                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet);
+            when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE " + ACCOUNT_USER_COLUMN
+                    + " = '" + CORRUPTED_BACKUP_USERNAME + "'")).thenReturn(testCorruptedAcctResultSet);
+            when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                    + ACCOUNT_USER_COLUMN + " = '" + NONEXISTANT_USER + "'")).thenReturn(emptyResultSet);
+            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN
+                    + " in(3)")).thenReturn(emptyResultSet);
+            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
+                    " in(1)")).thenReturn(testBackupResultSet);
+            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
+                    " in(2)")).thenReturn(testCorruptedBackupResultSet);
+
+            try {
+                databaseTool = new DatabaseTool(statement, connection);
+                databaseTool.createAccount(USERNAME, PASSWORD);
+                when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                        + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(testAcctResultSet);
+                testAccount = databaseTool.signIn(USERNAME, PASSWORD);
+            } catch (InvalidAccountException e) {
+                fail("Failed to sign in to test account.");
+            } catch (UsernameAlreadyExistsException e) {
+                fail("Test account shouldn't already exist.");
+            }
+        } catch (SQLException e) {
+            fail("SQLException should not have been thrown.");
         }
     }
 
@@ -173,7 +177,7 @@ public class DatabaseToolTest {
     }
 
     @Test
-    public void testBackupData() throws SQLException {
+    public void testBackupData() {
         JSONArray data = null;
 
         try {
@@ -185,8 +189,12 @@ public class DatabaseToolTest {
             fail("Failed to read test data file.");
         }
 
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(testBackupResultSet);
+        try {
+            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
+                    " in(1)")).thenReturn(testBackupResultSet);
+        } catch (SQLException e) {
+            fail("SQLException should not have been thrown.");
+        }
 
         JSONArray retrievedBackup;
         try {
@@ -224,9 +232,13 @@ public class DatabaseToolTest {
     }
 
     @Test
-    public void testOverwriteBackup() throws SQLException {
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(emptyResultSet);
+    public void testOverwriteBackup() {
+        try {
+            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
+                    " in(1)")).thenReturn(emptyResultSet);
+        } catch (SQLException e) {
+            fail("SQLException should not have been thrown.");
+        }
         testBackupData();
         testBackupData();
     }
