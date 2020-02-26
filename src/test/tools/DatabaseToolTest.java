@@ -9,19 +9,18 @@ import model.exception.NoBackupFoundException;
 import model.exception.UsernameAlreadyExistsException;
 import org.json.simple.JSONArray;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import persistence.Reader;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatabaseToolTest {
     private static final String TEST_DATA_FILE = "./data/test_save_data.json";
     private static final String USERNAME = "testuser";
@@ -51,8 +50,11 @@ public class DatabaseToolTest {
     @Mock
     private ResultSet emptyResultSet;
 
-    @Before
-    public void setUpMocking() throws SQLException {
+    private DatabaseTool databaseTool;
+    private Account testAccount;
+
+    @BeforeEach
+    public void setUpMocking() {
         JSONArray testBackupData = null;
         try {
             testBackupData = Reader.readFile(new File(TEST_DATA_FILE));
@@ -60,49 +62,51 @@ public class DatabaseToolTest {
             fail("Failed to read in test data file.");
         }
 
-        when(testAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
-        when(testAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(1);
-        when(testAcctResultSet.next()).thenReturn(true);
-        when(testCorruptedAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
-        when(testCorruptedAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(2);
-        when(testCorruptedAcctResultSet.next()).thenReturn(true);
-        when(testBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn(testBackupData.toString());
-        when(testBackupResultSet.next()).thenReturn(true);
-        when(testCorruptedBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn("Invalid backup data.");
-        when(testCorruptedBackupResultSet.next()).thenReturn(true);
-        when(emptyResultSet.next()).thenReturn(false);
-
-        when(statement.execute(any(String.class))).thenReturn(true);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE " + ACCOUNT_USER_COLUMN
-                + " = '" + CORRUPTED_BACKUP_USERNAME + "'")).thenReturn(testCorruptedAcctResultSet);
-        when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                + ACCOUNT_USER_COLUMN + " = '" + NONEXISTANT_USER + "'")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN
-                        + " in(3)")).thenReturn(emptyResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(testBackupResultSet);
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(2)")).thenReturn(testCorruptedBackupResultSet);
-
         try {
-            databaseTool = new DatabaseTool(statement, connection);
-            databaseTool.createAccount(USERNAME, PASSWORD);
-            when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(testAcctResultSet);
-            testAccount = databaseTool.signIn(USERNAME, PASSWORD);
-        } catch (InvalidAccountException e) {
-            fail("Failed to sign in to test account.");
-        } catch (UsernameAlreadyExistsException e) {
-            fail("Test account shouldn't already exist.");
+            Mockito.lenient().when(testAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
+            Mockito.lenient().when(testAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(1);
+            Mockito.lenient().when(testAcctResultSet.next()).thenReturn(true);
+            Mockito.lenient().when(testCorruptedAcctResultSet.getString(ACCOUNT_PASS_COLUMN)).thenReturn(PASSWORD);
+            Mockito.lenient().when(testCorruptedAcctResultSet.getInt(ACCOUNT_ID_COLUMN)).thenReturn(2);
+            Mockito.lenient().when(testCorruptedAcctResultSet.next()).thenReturn(true);
+            Mockito.lenient().when(testBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn(testBackupData.toString());
+            Mockito.lenient().when(testBackupResultSet.next()).thenReturn(true);
+            Mockito.lenient().when(testCorruptedBackupResultSet.getString(BACKUPS_DATA_COLUMN)).thenReturn("Invalid backup data.");
+            Mockito.lenient().when(testCorruptedBackupResultSet.next()).thenReturn(true);
+            Mockito.lenient().when(emptyResultSet.next()).thenReturn(false);
+
+            Mockito.lenient().when(statement.execute(any(String.class))).thenReturn(true);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                    + ACCOUNT_USER_COLUMN  + " = '" + CORRUPTED_BACKUP_USERNAME
+                    + "'")).thenReturn(testCorruptedAcctResultSet);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                    + ACCOUNT_USER_COLUMN + " = '" + NONEXISTANT_USER + "'")).thenReturn(emptyResultSet);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE "
+                    + BACKUPS_ID_COLUMN  + " in(3)")).thenReturn(emptyResultSet);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE "
+                    + BACKUPS_ID_COLUMN + " in(1)")).thenReturn(testBackupResultSet);
+            Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE "
+                    + BACKUPS_ID_COLUMN + " in(2)")).thenReturn(testCorruptedBackupResultSet);
+
+            try {
+                databaseTool = new DatabaseTool(statement, connection);
+                databaseTool.createAccount(USERNAME, PASSWORD);
+                Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                        + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(testAcctResultSet);
+                testAccount = databaseTool.signIn(USERNAME, PASSWORD);
+            } catch (InvalidAccountException e) {
+                fail("Failed to sign in to test account.");
+            } catch (UsernameAlreadyExistsException e) {
+                fail("Test account shouldn't already exist.");
+            }
+        } catch (SQLException e) {
+            fail("SQLException was thrown, but it shouldn't have been.");
         }
     }
 
-    private DatabaseTool databaseTool;
-    private Account testAccount;
-
-    @After
+    @AfterEach
     public void close() {
         try {
             databaseTool.deleteAccount(testAccount);
@@ -185,8 +189,8 @@ public class DatabaseToolTest {
             fail("Failed to read test data file.");
         }
 
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(testBackupResultSet);
+        Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE "
+                + BACKUPS_ID_COLUMN + " in(1)")).thenReturn(testBackupResultSet);
 
         JSONArray retrievedBackup;
         try {
@@ -225,8 +229,8 @@ public class DatabaseToolTest {
 
     @Test
     public void testOverwriteBackup() throws SQLException {
-        when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                " in(1)")).thenReturn(emptyResultSet);
+        Mockito.lenient().when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE "
+                + BACKUPS_ID_COLUMN + " in(1)")).thenReturn(emptyResultSet);
         testBackupData();
         testBackupData();
     }
