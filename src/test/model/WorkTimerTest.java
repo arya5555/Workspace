@@ -63,21 +63,21 @@ public class WorkTimerTest {
         }
     }
 
-//    @Test
-//    public void testTimeUp() {
-//        timer = new WorkTimer(0, Thread.currentThread(), icon);
-//        boolean interrupted = false;
-//        timer.run();
-//
-//        try {
-//            Thread.sleep(DELAY + 1000);
-//        } catch (InterruptedException e) {
-//            interrupted = true;
-//        } finally {
-//            assertTrue(interrupted);
-//            assertEquals("0:00:00", timer.getTime());
-//        }
-//    }
+    @Test
+    public void testTimeUp() {
+        timer = new WorkTimer(0, Thread.currentThread(), icon);
+        boolean interrupted = false;
+        timer.run();
+
+        try {
+            Thread.sleep(DELAY + 1000);
+        } catch (InterruptedException e) {
+            interrupted = true;
+        } finally {
+            assertTrue(interrupted);
+            assertEquals("0:00:00", timer.getTime());
+        }
+    }
 
     @Test
     public void testAddTime() {

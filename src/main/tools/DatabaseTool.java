@@ -32,6 +32,12 @@ public class DatabaseTool {
         statement = connection.createStatement();
     }
 
+    // EFFECTS: creates database tool with given connection and statement, used for testing
+    public DatabaseTool(Statement statement, Connection connection) {
+        this.connection = connection;
+        this.statement = statement;
+    }
+
     // EFFECTS: if can't connect to sql database, throws SQLException
     //          if password doesn't match password stored in database for given username, throws InvalidAccountException
     //          otherwise, returns account stored in database
@@ -85,7 +91,7 @@ public class DatabaseTool {
         }
 
         if (backupAlreadyExists) {
-            statement.executeUpdate("UPDATE " + BACKUPS_TABLE + " SET " + BACKUPS_DATA_COLUMN + " = '"
+            statement.execute("UPDATE " + BACKUPS_TABLE + " SET " + BACKUPS_DATA_COLUMN + " = '"
                     + data.toString() + "' WHERE " + BACKUPS_ID_COLUMN + " in(" + account.getId() + ")");
         } else {
             statement.execute("INSERT INTO " + BACKUPS_TABLE + " (" + BACKUPS_ID_COLUMN + ","
@@ -109,7 +115,7 @@ public class DatabaseTool {
 
         if (resultSet.next()) {
             JSONParser jsonParser = new JSONParser();
-            String result = (String) resultSet.getObject(BACKUPS_DATA_COLUMN);
+            String result = resultSet.getString(BACKUPS_DATA_COLUMN);
             JSONArray jsonArray = null;
             try {
                 jsonArray = (JSONArray) jsonParser.parse(result);
@@ -128,6 +134,5 @@ public class DatabaseTool {
     public void close() throws SQLException {
         statement.close();
         connection.close();
-        resultSet.close();
     }
 }
