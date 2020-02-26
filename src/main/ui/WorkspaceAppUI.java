@@ -179,7 +179,7 @@ public class WorkspaceAppUI {
     // EFFECTS: asks user to specify which space to delete, then removes it from workspace
     private void deleteSpace() {
         boolean run = true;
-        String input = null;
+        String input;
 
         while (run) {
             System.out.println("Enter name of space to delete (or enter \"" + CANCEL_CMD + "\" to cancel).");
