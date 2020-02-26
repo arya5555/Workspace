@@ -65,11 +65,11 @@ public class WorkTimer implements Runnable {
         timer.cancel();
         callingThread.interrupt();
 
-        if (traySupported) {
-            systemTrayTool.showPopup("Time's up!", "Your work timer in "
-                    + callingThread.getName() + " is finished.");
-            systemTrayTool.deleteTrayIcon();
-        }
+//        if (traySupported) {
+//            systemTrayTool.showPopup("Time's up!", "Your work timer in "
+//                    + callingThread.getName() + " is finished.");
+//            systemTrayTool.deleteTrayIcon();
+//        }
     }
 
     // MODIFIES: this

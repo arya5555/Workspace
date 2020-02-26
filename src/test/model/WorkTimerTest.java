@@ -23,6 +23,7 @@ public class WorkTimerTest {
         } catch (IOException e) {
             fail();
         }
+
         timer = new WorkTimer(10, Thread.currentThread(), icon);
         timer.setDelayForTesting(DELAY);
     }
