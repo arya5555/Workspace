@@ -9,24 +9,24 @@ import model.exception.NoBackupFoundException;
 import model.exception.UsernameAlreadyExistsException;
 import org.json.simple.JSONArray;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
 import persistence.Reader;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DatabaseToolTest {
     private static final String TEST_DATA_FILE = "./data/test_save_data.json";
     private static final String USERNAME = "testuser";
     private static final String PASSWORD = "testpass";
-    private static final String NONEXISTANT_USER = "nonexistantuser";
+    private static final String NONEXISTENT_USER = "nonexistantuser";
     private static final String CORRUPTED_BACKUP_USERNAME = "testCorruptedUser";
     private static final String ACCOUNT_TABLE = "accounts";
     private static final String ACCOUNT_ID_COLUMN = "id";
@@ -35,24 +35,22 @@ public class DatabaseToolTest {
     private static final String BACKUPS_TABLE = "backups";
     private static final String BACKUPS_ID_COLUMN = "userid";
     private static final String BACKUPS_DATA_COLUMN = "json_backup";
+    private static final String SQL_URL = "jdbc:mysql://34.95.8.137:3306/workspace";
+    private static final String SQL_USER = "workspaceApp";
+    private static final String SQL_PASS = "8ecM&a!32hN";
 
-    @Mock
-    private Statement statement;
-    @Mock
-    private Connection connection;
-    @Mock
-    private ResultSet testAcctResultSet;
-    @Mock
-    private ResultSet testCorruptedAcctResultSet;
-    @Mock
-    private ResultSet testBackupResultSet;
-    @Mock
-    private ResultSet testCorruptedBackupResultSet;
-    @Mock
-    private ResultSet emptyResultSet;
+    @Mock private Statement statement;
+    @Mock private Connection connection;
+    @Mock private ResultSet testAcctResultSet;
+    @Mock private ResultSet testCorruptedAcctResultSet;
+    @Mock private ResultSet testBackupResultSet;
+    @Mock private ResultSet testCorruptedBackupResultSet;
+    @Mock private ResultSet emptyResultSet;
 
-    @Before
+    @BeforeAll
     public void setUpMocking() {
+        Mockito.mockitoSession().initMocks(this).strictness(Strictness.STRICT_STUBS).startMocking();
+
         JSONArray testBackupData = null;
         try {
             testBackupData = Reader.readFile(new File(TEST_DATA_FILE));
@@ -73,40 +71,49 @@ public class DatabaseToolTest {
             when(testCorruptedBackupResultSet.next()).thenReturn(true);
             when(emptyResultSet.next()).thenReturn(false);
 
-            when(statement.execute(any(String.class))).thenReturn(true);
-            when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet);
+            when(statement.execute(anyString())).thenReturn(true);
             when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE " + ACCOUNT_USER_COLUMN
                     + " = '" + CORRUPTED_BACKUP_USERNAME + "'")).thenReturn(testCorruptedAcctResultSet);
             when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                    + ACCOUNT_USER_COLUMN + " = '" + NONEXISTANT_USER + "'")).thenReturn(emptyResultSet);
+                    + ACCOUNT_USER_COLUMN + " = '" + NONEXISTENT_USER + "'")).thenReturn(emptyResultSet);
             when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN
                     + " in(3)")).thenReturn(emptyResultSet);
             when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                    " in(1)")).thenReturn(testBackupResultSet);
+                    " in(1)")).thenReturn(emptyResultSet).thenReturn(testBackupResultSet);
             when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
                     " in(2)")).thenReturn(testCorruptedBackupResultSet);
-
-            try {
-                databaseTool = new DatabaseTool(statement, connection);
-                databaseTool.createAccount(USERNAME, PASSWORD);
-                when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
-                        + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(testAcctResultSet);
-                testAccount = databaseTool.signIn(USERNAME, PASSWORD);
-            } catch (InvalidAccountException e) {
-                fail("Failed to sign in to test account.");
-            } catch (UsernameAlreadyExistsException e) {
-                fail("Test account shouldn't already exist.");
-            }
         } catch (SQLException e) {
             fail("SQLException should not have been thrown.");
+        }
+    }
+
+    @BeforeEach
+    public void setUp() {
+        try {
+            when(statement.executeQuery("SELECT * FROM " + ACCOUNT_TABLE + " WHERE "
+                    + ACCOUNT_USER_COLUMN + " = '" + USERNAME + "'")).thenReturn(emptyResultSet)
+                    .thenReturn(testAcctResultSet);
+        } catch (SQLException e) {
+            fail("SQLException should not be thrown.");
+        }
+
+        try {
+            databaseTool = new DatabaseTool(statement, connection);
+            databaseTool.createAccount(USERNAME, PASSWORD);
+            testAccount = databaseTool.signIn(USERNAME, PASSWORD);
+        } catch (InvalidAccountException e) {
+            fail("Failed to sign in to test account.");
+        } catch (SQLException e) {
+            fail("SQLException should not have been thrown.");
+        } catch (UsernameAlreadyExistsException e) {
+            fail("Test account should not already exist.");
         }
     }
 
     private DatabaseTool databaseTool;
     private Account testAccount;
 
-    @After
+    @AfterAll
     public void close() {
         try {
             databaseTool.deleteAccount(testAccount);
@@ -122,6 +129,26 @@ public class DatabaseToolTest {
         }
     }
 
+    @Test
+    public void testRegularConstructor() {
+        // Calls regular constructor for code coverage, also checks that it throws SQLException when connection can't
+        // be made
+
+        boolean connectionAvailable;
+
+        try {
+            DriverManager.getConnection(SQL_URL,SQL_USER,SQL_PASS);
+            connectionAvailable = true;
+        } catch (SQLException e) {
+            connectionAvailable = false;
+        }
+        try {
+            new DatabaseTool();
+            assertTrue(connectionAvailable);
+        } catch (SQLException e) {
+            assertFalse(connectionAvailable);
+        }
+    }
     @Test
     public void testSignIn() {
         assertEquals(USERNAME, testAccount.getUserName());
@@ -140,9 +167,9 @@ public class DatabaseToolTest {
     }
 
     @Test
-    public void testSignInNonexistantAccount() {
+    public void testSignInNonexistentAccount() {
         try {
-            Account account = databaseTool.signIn(NONEXISTANT_USER, "wrongPassword");
+            Account account = databaseTool.signIn(NONEXISTENT_USER, "wrongPassword");
             fail("Should have returned InvalidAccountException, returned no exceptions.");
         } catch (SQLException e) {
             fail("Failed to communicate with database to sign in to account.");
@@ -176,8 +203,7 @@ public class DatabaseToolTest {
         }
     }
 
-    @Test
-    public void testBackupData() {
+    private void testBackupData() {
         JSONArray data = null;
 
         try {
@@ -187,13 +213,6 @@ public class DatabaseToolTest {
             fail("Failed to communicate with database to back up data.");
         } catch (Exception e) {
             fail("Failed to read test data file.");
-        }
-
-        try {
-            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                    " in(1)")).thenReturn(testBackupResultSet);
-        } catch (SQLException e) {
-            fail("SQLException should not have been thrown.");
         }
 
         JSONArray retrievedBackup;
@@ -232,13 +251,7 @@ public class DatabaseToolTest {
     }
 
     @Test
-    public void testOverwriteBackup() {
-        try {
-            when(statement.executeQuery("SELECT * FROM " + BACKUPS_TABLE + " WHERE " + BACKUPS_ID_COLUMN +
-                    " in(1)")).thenReturn(emptyResultSet);
-        } catch (SQLException e) {
-            fail("SQLException should not have been thrown.");
-        }
+    public void testBackupAndOverwrite() {
         testBackupData();
         testBackupData();
     }
