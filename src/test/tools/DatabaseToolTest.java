@@ -162,7 +162,7 @@ public class DatabaseToolTest {
         } catch (SQLException e) {
             fail("Failed to communicate with database to sign in to account.");
         } catch (InvalidAccountException e) {
-            // Expected result
+            // Expected result, account doesn't exist
         }
     }
 
