@@ -242,6 +242,7 @@ public class WorkspaceAppUI {
             databaseTool.close();
             return account;
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("Error reaching database. Could not sign in.");
             throw new FailedToGetAccountException();
         } catch (InvalidAccountException e) {

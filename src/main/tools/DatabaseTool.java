@@ -13,7 +13,7 @@ import java.sql.*;
 public class DatabaseTool {
     private static final String SQL_URL = "jdbc:mysql://34.95.8.137:3306/workspace";
     private static final String SQL_USER = "workspaceApp";
-    private static final String SQL_PASS = "8ecM&a!32hN";
+    private static final String SQL_PASS = "aj!%hei.8en";
     private static final String ACCOUNT_TABLE = "accounts";
     private static final String ACCOUNT_ID_COLUMN = "id";
     private static final String ACCOUNT_USER_COLUMN = "user";
