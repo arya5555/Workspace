@@ -179,7 +179,7 @@ public class WorkspaceAppUI {
     // EFFECTS: asks user to specify which space to delete, then removes it from workspace
     private void deleteSpace() {
         boolean run = true;
-        String input;
+        String input = null;
 
         while (run) {
             System.out.println("Enter name of space to delete (or enter \"" + CANCEL_CMD + "\" to cancel).");
@@ -211,6 +211,124 @@ public class WorkspaceAppUI {
     private boolean checkValidSpaceName(String name) {
         return (!(COMMANDS.contains(name)) && !(workspace.getAllSpaceNames().contains(name)));
     }
+
+//    // EFFECTS: processes input to either sign into an account or create a new account
+//    //          returns the account, or throws FailedToGetAccountException
+//    private Account getAccount() throws FailedToGetAccountException {
+//        System.out.println("Enter \"" + SIGN_IN_CMD + "\" to sign in to an existing account, \""
+//                + SIGN_UP_CMD + "\" to create a new account, or anything else to cancel.");
+//        String input = userInput.nextLine().toUpperCase();
+//
+//        if (input.equals(SIGN_IN_CMD)) {
+//            return accountSignIn();
+//        } else if (input.equals(SIGN_UP_CMD)) {
+//            return newAccount();
+//        } else {
+//            throw new FailedToGetAccountException();
+//        }
+//    }
+//
+//    // EFFECTS: gets input to sign into account and returns account
+//    //          if this fails, thows FailedToGetAccountException
+//    private Account accountSignIn() throws FailedToGetAccountException {
+//        System.out.println("Enter username:");
+//        String username = userInput.nextLine();
+//        System.out.println("Enter password:");
+//        String password = userInput.nextLine();
+//
+//        try {
+//            DatabaseTool databaseTool = new DatabaseTool();
+//            Account account = databaseTool.signIn(username, password);
+//            databaseTool.close();
+//            return account;
+//        } catch (SQLException e) {
+//            System.out.println("Error reaching database. Could not sign in.");
+//            throw new FailedToGetAccountException();
+//        } catch (InvalidAccountException e) {
+//            System.out.println("Username and password did not match. Could not sign in.");
+//            throw new FailedToGetAccountException();
+//        }
+//    }
+//
+//    // EFFECTS: gets input and creates a new account, which is returned
+//    //          throws FailedToGetAccount if there is an error connecting to database
+//    private Account newAccount() throws FailedToGetAccountException {
+//        System.out.println("Enter new username:");
+//        String username = userInput.nextLine();
+//        System.out.println("Enter new password:");
+//        String password = userInput.nextLine();
+//
+//        try {
+//            DatabaseTool databaseTool = new DatabaseTool();
+//            databaseTool.createAccount(username, password);
+//            Account account = databaseTool.signIn(username, password);
+//            databaseTool.close();
+//            return account;
+//        } catch (SQLException e) {
+//            System.out.println("Error communicating with database. New account was not created.");
+//            throw new FailedToGetAccountException();
+//        } catch (InvalidAccountException e) {
+//            // programming error
+//            throw new FailedToGetAccountException();
+//        } catch (UsernameAlreadyExistsException e) {
+//            System.out.println("Username already exists. Please choose another username.");
+//            return newAccount();
+//        }
+//    }
+//
+//    // MODIFIES: this
+//    // EFFECTS: restores space data from online backup under account if there is one
+//    private void restoreSpacesFromBackup() {
+//        JSONArray backup = null;
+//
+//        try {
+//            Account account = getAccount();
+//            DatabaseTool databaseTool = new DatabaseTool();
+//            backup = databaseTool.retrieveBackup(account);
+//            databaseTool.close();
+//        } catch (FailedToGetAccountException e) {
+//            return;
+//        } catch (SQLException e) {
+//            System.out.println("Failed to communicate with database to retrieve data. Data was not restored.");
+//            return;
+//        } catch (NoBackupFoundException e) {
+//            System.out.println("No backup was found for this account. Data was not restored.");
+//            return;
+//        }
+//
+//        try {
+//            Writer writer = new Writer(new File(WORKSPACE_FILE));
+//            writer.write(backup.toString());
+//            writer.close();
+//            System.out.println("Data was sucessfully retrieved.");
+//        } catch (IOException e) {
+//            System.out.println("Failed to save retrieved data to " + WORKSPACE_FILE + ". Data was not restored.");
+//        }
+//    }
+//
+//    // EFFECTS: backs up space data to account
+//    private void backupSpaceData() {
+//        saveSpaces();
+//
+//        Account account;
+//
+//        try {
+//            account = getAccount();
+//        } catch (FailedToGetAccountException e) {
+//            System.out.println("Data was not backed up.");
+//            return;
+//        }
+//
+//        try {
+//            JSONArray data = Reader.readFile(new File(WORKSPACE_FILE));
+//            DatabaseTool databaseTool = new DatabaseTool();
+//            databaseTool.backupData(account, data);
+//            databaseTool.close();
+//            System.out.println("Data successfully backed up.");
+//        } catch (Exception e) {
+//            System.out.println("Failed to communicate with database to backup data. Data was not backed up.");
+//        }
+//    }
 
     // MODIFIES: this
     // EFFECTS: enters a space
