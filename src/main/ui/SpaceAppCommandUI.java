@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 // Command line UI within a space
-public class SpaceUI {
+public class SpaceAppCommandUI {
     private static final int TABLE_COLUMN_WIDTH = 60;
     private static final String OPEN_RESOURCE_CMD = "OPEN";
     private static final String OPEN_ALL_CMD = "OPEN ALL";
@@ -38,7 +38,7 @@ public class SpaceUI {
     private BufferedReader userInput;
 
     // EFFECTS: initializes and runs the ui for a space
-    public SpaceUI(Space space) {
+    public SpaceAppCommandUI(Space space) {
         this.space = space;
         runSpaceUI();
     }

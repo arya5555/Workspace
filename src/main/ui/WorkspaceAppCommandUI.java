@@ -1,21 +1,18 @@
 package ui;
 
-import model.Account;
 import model.Space;
 import model.WorkspaceApp;
 import model.exception.*;
-import org.json.simple.JSONArray;
 import persistence.Reader;
 import persistence.Writer;
 //import tools.DatabaseTool;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.*;
 
 // Command line UI for Workspace application
-public class WorkspaceAppUI {
+public class WorkspaceAppCommandUI {
     private static final String WORKSPACE_FILE = "./data/spaces.json";
     private static final String ADD_SPACE_CMD = "ADD";
     private static final String DELETE_SPACE_CMD = "DEL";
@@ -34,7 +31,7 @@ public class WorkspaceAppUI {
     private Scanner userInput;
 
     // EFFECTS: initializes and runs the workspace application
-    public WorkspaceAppUI() {
+    public WorkspaceAppCommandUI() {
         workspace = new WorkspaceApp();
         COMMANDS = new HashSet<>(
                 Arrays.asList(ADD_SPACE_CMD, DELETE_SPACE_CMD, EXIT_CMD, CANCEL_CMD, CONFIRM_CMD,
@@ -66,7 +63,7 @@ public class WorkspaceAppUI {
 
     // MODIFIES: this
     // EFFECTS: loads spaces from WORKSPACE_FILE, if that file exists;
-    // otherwise does nothing
+    //          otherwise throws IOException if file does not exist, or InvalidFormatException
     private void loadSpaces() throws IOException, InvalidFormatException {
         List<Space> spaces = Reader.readSpaces(new File(WORKSPACE_FILE));
         for (Space s : spaces) {
@@ -333,6 +330,6 @@ public class WorkspaceAppUI {
     // MODIFIES: this
     // EFFECTS: enters a space
     private void runSpace(Space space) {
-        new SpaceUI(space);
+        new SpaceAppCommandUI(space);
     }
 }
