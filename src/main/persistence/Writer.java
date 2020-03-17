@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+// allows saving a list of spaces to a JSON file
+// general format taken from TellerApp
 public class Writer {
     private PrintWriter printWriter;
 

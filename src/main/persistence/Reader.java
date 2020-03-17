@@ -15,6 +15,8 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 
+// allows reading a list of spaces from a JSON file
+// general format taken from TellerApp
 public class Reader {
 
     // EFFECTS: if file can't be found, throws IOException
