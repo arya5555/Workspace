@@ -52,8 +52,7 @@ public class SpaceTest {
 
     @Test
     public void testRunTimer() {
-        Image emptyImage = new BufferedImage(10, 10, 1);
-        space.startTimer(5, Thread.currentThread(), emptyImage);
+        space.startTimer(0, 5);
         assertEquals("0:05:00", space.getTimeOnTimer());
         assertTrue(space.isTimerRunning());
         space.cancelTimer();
@@ -62,8 +61,7 @@ public class SpaceTest {
 
     @Test
     public void testTimeUp() {
-        Image emptyImage = new BufferedImage(10, 10, 1);
-        space.startTimer(5, Thread.currentThread(), emptyImage);
+        space.startTimer(0, 0);
         space.timeUp();
         assertFalse(space.isTimerRunning());
         space.cancelTimer();

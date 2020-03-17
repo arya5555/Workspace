@@ -1,19 +1,12 @@
-package ui;
+package ui.commandline;
 
 import model.Space;
-import model.WorkspaceApp;
-import model.exception.*;
-import persistence.Reader;
-import persistence.Writer;
-//import tools.DatabaseTool;
+import ui.WorkspaceAppUI;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 // Command line UI for Workspace application
-public class WorkspaceAppCommandUI {
-    private static final String WORKSPACE_FILE = "./data/spaces.json";
+public class WorkspaceAppCommandUI extends WorkspaceAppUI {
     private static final String ADD_SPACE_CMD = "ADD";
     private static final String DELETE_SPACE_CMD = "DEL";
     private static final String EXIT_CMD = "EXIT";
@@ -27,12 +20,11 @@ public class WorkspaceAppCommandUI {
 
     private static Set<String> COMMANDS;
 
-    WorkspaceApp workspace;
     private Scanner userInput;
 
     // EFFECTS: initializes and runs the workspace application
     public WorkspaceAppCommandUI() {
-        workspace = new WorkspaceApp();
+        super();
         COMMANDS = new HashSet<>(
                 Arrays.asList(ADD_SPACE_CMD, DELETE_SPACE_CMD, EXIT_CMD, CANCEL_CMD, CONFIRM_CMD,
                         BACKUP_CMD, RESTORE_CMD, HELP_CMD));
@@ -61,41 +53,10 @@ public class WorkspaceAppCommandUI {
         saveSpaces();
     }
 
-    // MODIFIES: this
-    // EFFECTS: loads spaces from WORKSPACE_FILE, if that file exists;
-    //          otherwise throws IOException if file does not exist, or InvalidFormatException
-    private void loadSpaces() throws IOException, InvalidFormatException {
-        List<Space> spaces = Reader.readSpaces(new File(WORKSPACE_FILE));
-        for (Space s : spaces) {
-            workspace.addSpace(s);
-        }
-    }
-
-    // EFFECTS: saves state of all spaces in workspace to WORKSPACE_FILE
-    private void saveSpaces() {
-        try {
-            Writer writer = new Writer(new File(WORKSPACE_FILE));
-            writer.write(workspace);
-            writer.close();
-            System.out.println("Space data saved to file " + WORKSPACE_FILE);
-        } catch (IOException e) {
-            System.out.println("File error: Unable to save to " + WORKSPACE_FILE);
-        }
-    }
-
     // EFFECTS: initializes workspace
     private void init() {
         userInput = new Scanner(System.in);
-        try {
-            loadSpaces();
-        } catch (IOException e) {
-            System.out.println("Could not find previous save file " + WORKSPACE_FILE);
-            System.out.println("No saved spaces were loaded.");
-        } catch (InvalidFormatException e) {
-            System.out.println("Save file " + WORKSPACE_FILE
-                    + " was found, but contents were not in the correct format");
-            System.out.println("No saved spaces were loaded.");
-        }
+        loadSaveData();
     }
 
     // EFFECTS: display options
@@ -207,6 +168,11 @@ public class WorkspaceAppCommandUI {
     // EFFECTS: returns true if name is not an existing space name and not a command keyword, otherwise returns false
     private boolean checkValidSpaceName(String name) {
         return (!(COMMANDS.contains(name)) && !(workspace.getAllSpaceNames().contains(name)));
+    }
+
+    // EFFECTS: outputs the given message to console
+    protected void displayMessage(String message) {
+        System.out.println(message);
     }
 
 //    // EFFECTS: processes input to either sign into an account or create a new account
@@ -329,7 +295,7 @@ public class WorkspaceAppCommandUI {
 
     // MODIFIES: this
     // EFFECTS: enters a space
-    private void runSpace(Space space) {
-        new SpaceAppCommandUI(space);
+    protected void runSpace(Space space) {
+        new SpaceCommandUI(space);
     }
 }

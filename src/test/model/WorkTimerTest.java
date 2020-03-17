@@ -1,5 +1,7 @@
 package model;
 
+import model.event.TimerEvent;
+import model.listener.TimerListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,77 +14,117 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class WorkTimerTest {
     private static final int DELAY = 200;
-    private static final String TIMER_ICON_FILE = "./data/timer.png";
-    WorkTimer timer;
+    private WorkTimer timer;
+    private int numTicks;
+    private boolean timeUp;
+
     Image icon;
 
     @BeforeEach
     public void setUp() {
-        try {
-            icon = ImageIO.read(new File(TIMER_ICON_FILE));
-        } catch (IOException e) {
-            fail();
-        }
-
-        timer = new WorkTimer(10, Thread.currentThread(), icon);
+        timer = new WorkTimer(0, 10);
         timer.setDelayForTesting(DELAY);
+        numTicks = 0;
+        timeUp = false;
     }
 
     @Test
     public void testConstructor() {
         assertEquals("0:10:00", timer.getTime());
+        assertEquals(0, timer.getHours());
         assertEquals(10, timer.getMinutes());
         assertEquals(0, timer.getSeconds());
     }
 
     @Test
     public void testRunTimer() {
+        timer.addTimerListener(new TimerListener() {
+            @Override
+            public void timerTick(TimerEvent e) {
+                incrementTicks();
+            }
+
+            @Override
+            public void timeUp(TimerEvent e) {
+                fail("Timer should not have fired time up event.");
+            }
+        });
+
         timer.run();
         try {
-            Thread.sleep(DELAY * 2 + 100);
+            Thread.sleep(DELAY*3);
         } catch (InterruptedException e) {
-            fail();
+            fail("Thread should not have been interrupted.");
         }
-        int minutes = timer.getMinutes();
-        int seconds = timer.getSeconds();
-        assertEquals("0:09:58", timer.getTime());
-        assertEquals(9, minutes);
-        assertEquals(58, seconds);
+        timer.cancelTimer();
+
+        assertEquals("0:09:57", timer.getTime());
+        assertEquals(3, numTicks);
+    }
+
+    private void incrementTicks() {
+        numTicks++;
     }
 
     @Test
     public void testForcedCancelTimer() {
-        timer = new WorkTimer(0, Thread.currentThread(), icon);
+        timer = new WorkTimer(0, 10);
+        timer.addTimerListener(new TimerListener() {
+            @Override
+            public void timerTick(TimerEvent e) {
+                // do nothing
+            }
+
+            @Override
+            public void timeUp(TimerEvent e) {
+                fail("Timer should not have fired time up event.");
+            }
+        });
+
         timer.run();
+        timer.cancelTimer();
 
         try {
-            Thread.sleep(DELAY);
-            timer.cancelTimer();
             Thread.sleep(DELAY * 2);
         } catch (InterruptedException e) {
-            fail();
+            fail("Thread should not have been interrupted.");
         }
     }
 
     @Test
     public void testTimeUp() {
-        timer = new WorkTimer(0, Thread.currentThread(), icon);
-        boolean interrupted = false;
+        timer = new WorkTimer(0, 0);
+
+        timer.addTimerListener(new TimerListener() {
+            @Override
+            public void timerTick(TimerEvent e) {
+                // do nothing
+            }
+
+            @Override
+            public void timeUp(TimerEvent e) {
+                setTimeUp(true);
+            }
+        });
+
         timer.run();
 
         try {
-            Thread.sleep(DELAY + 1000);
+            Thread.sleep(DELAY);
         } catch (InterruptedException e) {
-            interrupted = true;
-        } finally {
-            assertTrue(interrupted);
-            assertEquals("0:00:00", timer.getTime());
+            fail("Thread should not have been interrupted.");
         }
+
+        assertEquals("0:00:00", timer.getTime());
+        assertTrue(timeUp);
+    }
+
+    private void setTimeUp(Boolean timeUp) {
+        this.timeUp = timeUp;
     }
 
     @Test
     public void testAddTime() {
-        timer.run();
         timer.addTime(5);
         assertEquals(15, timer.getMinutes());
     }

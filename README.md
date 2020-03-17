@@ -6,7 +6,7 @@ Workspace is intended to improve focus and productivity. Work is organized into 
 one category or block of work. It has wide applicability because one space could be a University class, work project,
 personal hobby, etc. Workspace lets you compile all relevant files, sites, to-dos, and more into one space. When you
 begin working, you enter a space and set a timer for how long you intend to work. Workspace eliminates distractions and
-provides you with tools relevant to your space, helping you focus. 
+provides you with network relevant to your space, helping you focus. 
 
 The program is especially useful for students, office workers, or self-employed people, as it helps promote focused and 
 efficient work. However, its functions can also be used for personal projects and hobbies, as the user can easily set up 

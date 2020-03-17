@@ -37,6 +37,12 @@ public class Space {
         resources.remove(index);
     }
 
+    // MODIFIES: this
+    // EFFECTS: removes resource of name from this space's resources
+    public void removeResource(String name) {
+        resources.removeIf(r -> r.getName().equals(name));
+    }
+
     // EFFECTS: returns resource with given name if it exists in this space,
     // otherwise returns null
     public Resource getResourceOfName(String name) {
@@ -83,12 +89,11 @@ public class Space {
         }
     }
 
-    // REQUIRES: minutes >= 0
+    // REQUIRES: hours >= 0, minutes >= 0
     // MODIFIES: this
-    // EFFECTS: starts a new timer thread
-    public void startTimer(int minutes, Thread callingThread, Image icon) {
-        Thread.currentThread().setName(name);
-        timer = new WorkTimer(minutes, callingThread, icon);
+    // EFFECTS: starts a new timer
+    public void startTimer(int hours, int minutes) {
+        timer = new WorkTimer(hours, minutes);
         timer.run();
         timerRunning = true;
     }

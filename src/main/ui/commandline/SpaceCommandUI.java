@@ -1,4 +1,4 @@
-package ui;
+package ui.commandline;
 
 import model.*;
 import model.exception.FailedToOpenException;
@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 // Command line UI within a space
-public class SpaceAppCommandUI {
+public class SpaceCommandUI {
     private static final int TABLE_COLUMN_WIDTH = 60;
     private static final String OPEN_RESOURCE_CMD = "OPEN";
     private static final String OPEN_ALL_CMD = "OPEN ALL";
@@ -32,13 +32,12 @@ public class SpaceAppCommandUI {
     private static final String CANCEL_CMD = "CANCEL";
     private static final String HELP_CMD = "HELP";
     private static final String CANCEL_TIMER_CMD = "CANCEL TIMER";
-    private static final String TIMER_ICON_FILE = "timer.png";
 
     private Space space;
     private BufferedReader userInput;
 
     // EFFECTS: initializes and runs the ui for a space
-    public SpaceAppCommandUI(Space space) {
+    public SpaceCommandUI(Space space) {
         this.space = space;
         runSpaceUI();
     }
@@ -192,14 +191,10 @@ public class SpaceAppCommandUI {
             return;
         }
 
-        Image icon;
-        try {
-            icon = ImageIO.read(new File("./data/" + TIMER_ICON_FILE));
-        } catch (IOException e) {
-            icon = new BufferedImage(10, 10, 1);
-        }
+        int hours = minutes % 60;
+        minutes = minutes - hours * 60;
 
-        space.startTimer(minutes, Thread.currentThread(), icon);
+        space.startTimer(0, minutes);
     }
 
     // MODIFIES: this

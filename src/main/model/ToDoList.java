@@ -8,7 +8,7 @@ import java.util.List;
 
 // represents a to-do list, which contains a list of tasks
 public class ToDoList {
-    public static final String COMPLETED_TASK_PREFIX = "*DONE* ";
+    public static final String COMPLETED_TASK_PREFIX = "";
     List<Task> tasks;
 
     // EFFECTS: creates new to-do list with no tasks
@@ -29,11 +29,34 @@ public class ToDoList {
         tasks.remove(index);
     }
 
+    // MODIFIES: this
+    // EFFECTS: removes task of given description from to-do list
+    public void removeTask(String description) {
+        tasks.removeIf(t -> t.getDescription().equals(description));
+    }
+
     // REQUIRES: 0 <= index < # tasks in to-do list
     // MODIFIES: this
     // EFFECTS: marks task of given index as complete in to-do list
     public void completeTask(int index) {
         tasks.get(index).setComplete(true);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: marks task of given description as complete in to-do list
+    //          if no task matching description exists, does nothing
+    public void completeTask(String description) {
+        for (Task t : tasks) {
+            if (t.getDescription().equals(description)) {
+                t.setComplete(true);
+            }
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: deletes all tasks which are complete
+    public void deleteCompletedTasks() {
+        tasks.removeIf(Task::getComplete);
     }
 
     // EFFECTS: returns number of tasks in this to-do list
