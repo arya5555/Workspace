@@ -39,7 +39,7 @@ public abstract class WorkspaceAppUI {
     public void saveSpaces() {
         try {
             workspace.saveSpaces();
-            displayMessage("Space data saved to file " + WORKSPACE_FILE);
+            displayMessage("Workspace data saved to file " + WORKSPACE_FILE);
         } catch (IOException e) {
             displayMessage("File error: Unable to save to " + WORKSPACE_FILE);
         }

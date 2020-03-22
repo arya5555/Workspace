@@ -22,7 +22,7 @@ import java.io.IOException;
 
 // JPanel that displays a timer and buttons for controlling the timer
 public class TimerPanel extends JPanel implements GuiComponent {
-    private static final String TIMER_SOUND_FILE = "";
+    private static final String TIMER_SOUND_FILE = "./data/timer_tone.wav";
     private static final Color PANEL_COLOUR = ACCENT_1;
     private static final Color TEXT_COLOUR = MAIN_COLOUR_2;
     private static final String NOT_RUNNING_TOOLBAR = "not running";

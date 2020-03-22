@@ -58,3 +58,11 @@ distraction
 - As a user, I want to be able to restore data that is backed up online
 
 ## Instructions for Grader
+- Load the app by running main. It will preload some sample save data.
+- You can generate the first required event by clicking the plus button in the bottom right corner to add a new space
+- You can generate the second required event by clicking one of the listed spaces to display its contents 
+- You can trigger my audio component by clicking set time under the timer and setting the time to 0:00 (just so you 
+don't have to wait for the timer to tick down) and pressing start, the time will immediately be up and a chime will play.
+- You can save the state of my application by pressing the exit button to return to the main menu, then selecting 
+Save > Save locally in the top menu bar (or backup online).
+- You can reload the state of my application by selecting Load > Load local save in the top menu bar (or restore online backup).

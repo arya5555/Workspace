@@ -6,11 +6,10 @@ import model.exception.FailedToOpenException;
 import model.exception.SystemNotSupportedException;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.MalformedURLException;
+import java.awt.event.*;
+import java.io.File;
 
 // Graphic interface for a space, within a Workspace app
 public class SpaceGUI implements GuiComponent {
@@ -48,8 +47,6 @@ public class SpaceGUI implements GuiComponent {
                 parent.refresh();
             }
         });
-
-        //guiFrame.setJMenuBar(new WorkspaceMenuBar(guiFrame));
         addSplitPanes();
     }
 
@@ -191,15 +188,76 @@ public class SpaceGUI implements GuiComponent {
 
     // MODIFIES: this
     // EFFECTS: gets user input and adds a new resource to this space
-    private void addResource() {
+    private void addResourceDialog() {
         String[] resourceTypes = new String[] {Resource.ResourceType.LINK.toString(),
-                Resource.ResourceType.APP.toString(),
-                Resource.ResourceType.FILE.toString()};
-
+                Resource.ResourceType.FILE.toString(),
+                Resource.ResourceType.APP.toString()};
         JComboBox<String> resourceType = new JComboBox<>(resourceTypes);
         JTextField nameField = new JTextField();
         JTextField pathField = new JTextField();
+        JButton fileChooserButton = new JButton("Open file chooser");
+        JPanel panel = setupResourceDialog(resourceType, nameField, pathField, fileChooserButton);
 
+        int result = JOptionPane.showConfirmDialog(guiFrame, panel,
+                "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            addResource((String) resourceType.getSelectedItem(), nameField.getText(), pathField.getText());
+        }
+    }
+
+    // EFFECTS: creates a fileChooser dialog to load a resource
+    //          returns the file, or null if user cancels
+    private File resourceFileChooser(Boolean exeFilesOnly) {
+        JFileChooser fileChooser = new JFileChooser();
+        if (exeFilesOnly) {
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("EXE FILES", "exe");
+            fileChooser.setFileFilter(filter);
+        }
+
+        int result = fileChooser.showOpenDialog(guiFrame);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        } else {
+            return null;
+        }
+    }
+
+    // MODIFIES: JComboBox resourceType
+    // EFFECTS: sets up panel for adding a new resource with components and listeners
+    public JPanel setupResourceDialog(JComboBox<String> resourceType, JTextField nameField, JTextField pathField,
+                                      JButton fileChooserButton) {
+        JPanel panel = createResourceDialogPanel(resourceType, nameField, pathField, fileChooserButton);
+
+        resourceType.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (!resourceType.getSelectedItem().equals(Resource.ResourceType.LINK.toString())) {
+                    fileChooserButton.setEnabled(true);
+                } else {
+                    fileChooserButton.setEnabled(false);
+                }
+            }
+        });
+
+        fileChooserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Boolean exeFilesOnly = resourceType.getSelectedItem().equals(Resource.ResourceType.APP.toString());
+                File file = resourceFileChooser(exeFilesOnly);
+                if (file != null) {
+                    pathField.setText(file.getAbsolutePath());
+                    nameField.setText(file.getName());
+                }
+            }
+        });
+
+        return panel;
+    }
+
+    // MODIFIES: JComboBox resourceType
+    // EFFECTS: creates and returns panel for add resource dialog
+    private JPanel createResourceDialogPanel(JComboBox<String> resourceType, JTextField nameField, JTextField pathField,
+                                             JButton fileChooserButton) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Resource type:"));
@@ -211,13 +269,10 @@ public class SpaceGUI implements GuiComponent {
         panel.add(new JLabel("Resource path (link/filepath):"));
         panel.add(pathField);
         panel.add(Box.createRigidArea(new Dimension(0, MARGIN)));
+        panel.add(fileChooserButton);
+        fileChooserButton.setEnabled(false);
 
-        int result = JOptionPane.showConfirmDialog(guiFrame, panel,
-                "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (result == JOptionPane.OK_OPTION) {
-            addResource((String) resourceType.getSelectedItem(), nameField.getText(), pathField.getText());
-        }
+        return panel;
     }
 
     // REQUIRES: type is one of the possible Resource.ResourceTypes
@@ -250,7 +305,7 @@ public class SpaceGUI implements GuiComponent {
         } else if (e.getActionCommand().equals(OPEN_ALL_RESOURCES)) {
             openAllResources();
         } else if (e.getActionCommand().equals(ADD_RESOURCE)) {
-            addResource();
+            addResourceDialog();
         } else if (e.getActionCommand().equals(DELETE_RESOURCE)) {
             resourcePanel.setDeleteMode(true);
         } else if (e.getActionCommand().equals(DELETE_COMPLETED_TASKS)) {
