@@ -1,5 +1,6 @@
 package ui.gui;
 
+import javax.swing.*;
 import java.awt.*;
 
 interface GuiComponent {
@@ -15,7 +16,7 @@ interface GuiComponent {
 //    Color ACCENT_2 = new Color(237, 106, 90);
 
     // THEME 2
-    Color BACKGROUND = new Color(230, 235, 224);
+    Color BACKGROUND = new Color(235, 235, 235);
     Color MAIN_COLOUR = new Color(42, 157, 143);
     Color MAIN_COLOUR_2 = new Color(38, 70, 83);
     Color ACCENT_1 = new Color(233, 196, 106);
@@ -29,6 +30,7 @@ interface GuiComponent {
 //    Color ACCENT_2 = new Color(244, 91, 105);
 
     Color BUTTON_FG = WHITE;
+    Color GREY = new Color(200,200,200);
     Font GENERAL_FONT = new Font("ARIAL", Font.PLAIN, 16);
     Font LARGE_BOLD_FONT = new Font("ARIAL", Font.BOLD, 24);
     Font LARGE_FONT = new Font("ARIAL", Font.PLAIN, 24);

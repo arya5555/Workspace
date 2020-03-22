@@ -41,7 +41,7 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
     // EFFECTS: confirms that the user wants to delete the space, and deletes it
     //          if user cancels, does nothing
     public void deleteSpace(String name) {
-        if (guiFrame.popupQuestion("Are you sure you want to delete " + name + "?")) {
+        if (GuiFrame.popupQuestionOkCancel("Are you sure you want to delete " + name + "?")) {
             workspace.removeSpace(name);
         }
     }
@@ -49,10 +49,13 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
     // MODIFIES: this
     // EFFECTS: initializes workspace and gui
     private void init() {
+        guiFrame.setJMenuBar(new WorkspaceMenuBar(this));
         guiFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                saveSpaces();
+                if (GuiFrame.popupQuestionYesNo("Would you like to save your changes?")) {
+                    saveSpaces();
+                }
             }
         });
 
@@ -206,6 +209,7 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         }
     }
 
+    // MODIFIES:
     // MODIFIES: this
     // EFFECTS: asks user for new space name and adds it, or does nothing if the user cancels
     private void addSpace() {
@@ -218,6 +222,11 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         }
 
         workspace.addSpace(new Space(spaceName));
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
         createSpacesPanel();
         guiFrame.refresh();
     }
@@ -236,6 +245,11 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         spaceButtonsNormalMode();
         toolbarLayout.show(toolbar, EDIT_TOOLBAR_NAME);
         deleteMode = false;
+    }
+
+    // getters
+    public JFrame getJFrame() {
+        return guiFrame;
     }
 
     @Override

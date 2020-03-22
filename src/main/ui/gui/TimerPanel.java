@@ -1,14 +1,15 @@
 package ui.gui;
 
-import model.Resource;
 import model.WorkTimer;
 import model.event.TimerEvent;
 import model.exception.SystemNotSupportedException;
 import model.listener.TimerListener;
 import platformspecific.SystemTrayTool;
-import sun.security.krb5.internal.PAForUserEnc;
-
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -16,12 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
 
 // JPanel that displays a timer and buttons for controlling the timer
 public class TimerPanel extends JPanel implements GuiComponent {
+    private static final String TIMER_SOUND_FILE = "";
     private static final Color PANEL_COLOUR = ACCENT_1;
     private static final Color TEXT_COLOUR = MAIN_COLOUR_2;
     private static final String NOT_RUNNING_TOOLBAR = "not running";
@@ -273,7 +274,9 @@ public class TimerPanel extends JPanel implements GuiComponent {
                     trayTool.deleteTrayIcon();
                 }
 
+                playChime();
                 timer.setTime(0, DEFAULT_TIME);
+                toolbarLayout.show(toolbar, NOT_RUNNING_TOOLBAR);
                 updateTimerLabel();
             }
         });
@@ -289,5 +292,17 @@ public class TimerPanel extends JPanel implements GuiComponent {
         }
 
         return icon;
+    }
+
+    // EFFECTS: plays the timer chime sound
+    private void playChime() {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(TIMER_SOUND_FILE));
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            // do nothing: only effect is that alarm sound will not play
+        }
     }
 }

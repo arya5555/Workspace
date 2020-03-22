@@ -90,12 +90,15 @@ public class DatabaseTool {
             backupAlreadyExists = false;
         }
 
+        String dataString = data.toString().replace("\\/", "/");
+        dataString = dataString.replace("'", "\\'");
+
         if (backupAlreadyExists) {
             statement.execute("UPDATE " + BACKUPS_TABLE + " SET " + BACKUPS_DATA_COLUMN + " = '"
-                    + data.toString() + "' WHERE " + BACKUPS_ID_COLUMN + " in(" + account.getId() + ")");
+                    + dataString + "' WHERE " + BACKUPS_ID_COLUMN + " in(" + account.getId() + ")");
         } else {
             statement.execute("INSERT INTO " + BACKUPS_TABLE + " (" + BACKUPS_ID_COLUMN + ","
-                    + BACKUPS_DATA_COLUMN + ") VALUES ('" + account.getId() + "', '" + data.toString() + "')");
+                    + BACKUPS_DATA_COLUMN + ") VALUES ('" + account.getId() + "', '" + dataString + "')");
         }
     }
 

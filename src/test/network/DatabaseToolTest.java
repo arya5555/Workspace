@@ -24,13 +24,13 @@ public class DatabaseToolTest {
     private static final String NONEXISTANT_USER = "nonexistantuser";
     private static final String CORRUPTED_BACKUP_USERNAME = "testCorruptedUser";
 
-    // mysql -h 34.95.8.137 -u workspaceApp -p
+    // mysql -h 34.95.8.137 -u workspaceApp -p j*H3jHie382o
 
     private DatabaseTool databaseTool;
     private Account testAccount;
 
     @BeforeEach
-    public void setUpMocking() {
+    public void setUp() {
         try {
             databaseTool = new DatabaseTool();
             testAccount = databaseTool.signIn(USERNAME, PASSWORD);

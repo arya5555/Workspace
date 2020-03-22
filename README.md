@@ -53,3 +53,8 @@ distraction
 - As a user, I want to be able to mark a task as complete or delete it from a space
 - As a user, I want to be able to save all of the information in my spaces when I quit the application
 - As a user, I want my previously saved space data to be automatically loaded when I open the application
+- As a user, I want to be able to save my space data without quitting the application
+- As a user, I want to be able to backup my data to an online database
+- As a user, I want to be able to restore data that is backed up online
+
+## Instructions for Grader

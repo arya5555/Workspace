@@ -49,6 +49,7 @@ public class SpaceGUI implements GuiComponent {
             }
         });
 
+        //guiFrame.setJMenuBar(new WorkspaceMenuBar(guiFrame));
         addSplitPanes();
     }
 
