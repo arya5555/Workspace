@@ -7,7 +7,7 @@ import platformspecific.ResourceLauncher;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
-// represents a file with a name and a File object
+// Represents a shortcut to a file with a name and a File object
 public class FilePath implements Resource {
     protected String name;
     protected File file;
@@ -28,8 +28,21 @@ public class FilePath implements Resource {
     // EFFECTS: if system does not support opening files, throws SystemNotSupportedException
     //          if files no longer exists or fails to open, throws FailedToOpenException
     //          otherwise, opens file in default application
+    @Override
     public void launch() throws SystemNotSupportedException, FailedToOpenException {
         ResourceLauncher.openFile(file);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: attempts to set file to given path, throws NoSuchFileException if path is not valid
+    @Override
+    public void setPath(String path) throws NoSuchFileException {
+        File newFile = new File(path);
+        if (newFile.exists()) {
+            file = new File(path);
+        } else {
+            throw new NoSuchFileException(path);
+        }
     }
 
     // EFFECTS: returns file's extension
@@ -43,17 +56,6 @@ public class FilePath implements Resource {
         }
 
         return "";
-    }
-
-    // EFFECTS: attempts to set file to given path, throws exception if path is not valid
-    @Override
-    public void setPath(String path) throws NoSuchFileException {
-        File newFile = new File(path);
-        if (newFile.exists()) {
-            file = new File(path);
-        } else {
-            throw new NoSuchFileException(path);
-        }
     }
 
     //getters

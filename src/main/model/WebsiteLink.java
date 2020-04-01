@@ -8,20 +8,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-// represents a website with a name and URL
+// Represents a website link with a name and URL
 public class WebsiteLink implements Resource {
-    private static Set<Character> VALID_URL_CHARS;
+    // source for valid url characters:
+    // https://stackoverflow.com/questions/1547899/which-characters-make-a-url-invalid/1547940#1547940
+    private static Set<Character> VALID_URL_CHARS = new HashSet<>(
+            Arrays.asList('-','.','~','_',':','/','?','#','[',']','@',
+            '!','$','&','\'','(',')','*','+',',',';','%','='));
     private String name;
     private URL url;
 
-    // EFFECTS: initializes object with given name and url, throws exception if url is not valid
-
-    // source for valid url characters:
-    // https://stackoverflow.com/questions/1547899/which-characters-make-a-url-invalid/1547940#1547940
+    // EFFECTS: initializes object with given name and url, throws MalformedURLException if url is not valid
     public WebsiteLink(String name, String url) throws MalformedURLException {
-        VALID_URL_CHARS = new HashSet<>(
-                Arrays.asList('-','.','~','_',':','/','?','#','[',']','@',
-                        '!','$','&','\'','(',')','*','+',',',';','%','='));
         this.name = name;
         setPath(url);
     }
@@ -29,27 +27,10 @@ public class WebsiteLink implements Resource {
     // EFFECTS: if system does not support launching websites, throws SystemNotSupportedException
     //          if website fails to launch, throws FailedToOpenException
     //          otherwise, opens url in default browser
+    @Override
     public void launch() throws SystemNotSupportedException, FailedToOpenException {
         ResourceLauncher.openSite(url);
     }
-
-    //getters
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getPath() {
-        return url.toString();
-    }
-
-    @Override
-    public ResourceType getResourceType() {
-        return ResourceType.LINK;
-    }
-
-    //setters
 
     // EFFECTS: returns true if url contains only valid characters and sets this url,
     // otherwise throws exception and doesn't change this url
@@ -67,5 +48,21 @@ public class WebsiteLink implements Resource {
         }
 
         this.url = new URL(url);
+    }
+
+    //getters
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getPath() {
+        return url.toString();
+    }
+
+    @Override
+    public ResourceType getResourceType() {
+        return ResourceType.LINK;
     }
 }

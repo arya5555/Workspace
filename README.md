@@ -57,7 +57,7 @@ distraction
 - As a user, I want to be able to backup my data to an online database
 - As a user, I want to be able to restore data that is backed up online
 
-## Instructions for Grader
+## Phase 3 Instructions for Grader
 - Load the app by running main. It will preload some sample save data.
 - You can generate the first required event by clicking the plus button in the bottom right corner to add a new space
 - You can generate the second required event by clicking one of the listed spaces to display its contents 
@@ -66,3 +66,9 @@ don't have to wait for the timer to tick down) and pressing start, the time will
 - You can save the state of my application by pressing the exit button to return to the main menu, then selecting 
 Save > Save locally in the top menu bar (or backup online).
 - You can reload the state of my application by selecting Load > Load local save in the top menu bar (or restore online backup).
+
+## Phase 4
+# Task 2
+Type hierarchy: WebsiteLink and FilePath implement Resource (and AppShortcut extends FilePath)
+An example of an overridden method implemented differently is setPath(); in FilePath it checks that the path
+leads to a valid file, while in WebsiteLink it checks that the path is a valid URL.
