@@ -1,11 +1,16 @@
 package model;
 
+import model.exception.InvalidFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ui.gui.WorkspaceMenuBar;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WorkspaceAppTest {
+    private static final String TEST_SAVE_FILE = "./data/test_save_file";
     WorkspaceApp workspaceApp;
 
     @BeforeEach
@@ -57,5 +62,27 @@ public class WorkspaceAppTest {
         workspaceApp.addSpace(bioSpace);
 
         assertEquals(bioSpace, workspaceApp.getSpaceOfName("BIO"));
+    }
+
+    @Test
+    public void testLoadAndSaveSpaces() {
+        workspaceApp.addSpace(new Space("ENGLISH"));
+        workspaceApp.addSpace(new Space("BIO"));
+        try {
+            workspaceApp.saveSpaces(TEST_SAVE_FILE);
+        } catch (IOException e) {
+            fail("IOException was thrown.");
+        }
+
+        WorkspaceApp newWorkspaceApp = new WorkspaceApp();
+        try {
+            newWorkspaceApp.loadSpaces(TEST_SAVE_FILE);
+        } catch (IOException e) {
+            fail("IOException was thrown.");
+        } catch (InvalidFormatException e) {
+            fail("InvalidFormatException was thrown.");
+        }
+
+        assertEquals(2, newWorkspaceApp.getSpaces().size());
     }
 }

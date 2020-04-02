@@ -1,14 +1,9 @@
 package model;
 
-import model.event.TimerEvent;
-import model.listener.TimerListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,11 +89,12 @@ public class WorkTimerTest {
     @Test
     public void testTimeUp() {
         timer = new WorkTimer(0, 0);
+        timer.setTime(0, 0);
 
         timer.addTimerListener(new TimerListener() {
             @Override
             public void timerTick(TimerEvent e) {
-                // do nothing
+                e.getTimeString();
             }
 
             @Override

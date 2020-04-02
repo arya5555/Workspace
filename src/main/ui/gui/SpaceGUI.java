@@ -29,6 +29,7 @@ public class SpaceGUI implements GuiComponent {
     private GuiFrame guiFrame;
     private ChecklistPanel taskPanel;
     private ChecklistPanel resourcePanel;
+    private TimerPanel timerPanel;
 
     // EFFECTS: creates new gui frame for space and displays space info
     public SpaceGUI(Space space, GuiFrame parent) {
@@ -127,7 +128,7 @@ public class SpaceGUI implements GuiComponent {
                     }
                 });
 
-        for (Task t : space.getTodo().getTasks()) {
+        for (Task t : space.getTodo()) {
             if (t.getComplete()) {
                 taskPanel.setSelected(t.getDescription());
             }
@@ -167,7 +168,8 @@ public class SpaceGUI implements GuiComponent {
 
     // EFFECTS: creates and returns timer panel with timer
     private JPanel createTimerPanel() {
-        return new TimerPanel(space.getName());
+        timerPanel = new TimerPanel(space.getName());
+        return timerPanel;
     }
 
     // MODIFIES: this
@@ -176,7 +178,7 @@ public class SpaceGUI implements GuiComponent {
         String taskDescription;
 
         try {
-            taskDescription = guiFrame.popupTextField("New task:");
+            taskDescription = GuiFrame.popupTextField("New task:");
         } catch (CancelledException e) {
             return;
         }
@@ -324,9 +326,9 @@ public class SpaceGUI implements GuiComponent {
                 try {
                     space.getResourceOfName(resourceCheckBox.getText()).launch();
                 } catch (SystemNotSupportedException e) {
-                    guiFrame.displayMessage("System does not support launching resources.");
+                    GuiFrame.displayMessage("System does not support launching resources.");
                 } catch (FailedToOpenException ee) {
-                    guiFrame.displayMessage("One or more resources failed to launch.");
+                    GuiFrame.displayMessage("One or more resources failed to launch.");
                 }
             }
         }
@@ -337,18 +339,9 @@ public class SpaceGUI implements GuiComponent {
         try {
             space.launchAllResources();
         } catch (SystemNotSupportedException e) {
-            guiFrame.displayMessage("System does not support launching resources.");
+            GuiFrame.displayMessage("System does not support launching resources.");
         } catch (FailedToOpenException ee) {
-            guiFrame.displayMessage("One or more resources failed to launch.");
+            GuiFrame.displayMessage("One or more resources failed to launch.");
         }
-    }
-
-    // MODIFIES: panel
-    // EFFECTS: formats a panel to display space components
-    private void formatPanel(JPanel panel) {
-        panel.setBackground(PANEL_COLOUR);
-
-        panel.setLayout(new BorderLayout(MARGIN, MARGIN));
-        panel.setBorder(BorderFactory.createLineBorder(PANEL_COLOUR, MARGIN));
     }
 }

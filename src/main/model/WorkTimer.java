@@ -1,13 +1,6 @@
 package model;
 
-import model.event.TimerEvent;
-import model.exception.SystemNotSupportedException;
-import model.listener.TimerListener;
-import platformspecific.SystemTrayTool;
-
-import javax.swing.*;
 import javax.swing.event.EventListenerList;
-import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,12 +34,6 @@ public class WorkTimer {
     // EFFECTS: adds timer listener to this timer
     public void addTimerListener(TimerListener listener) {
         listenerList.add(TimerListener.class, listener);
-    }
-
-    // MODIFIES: this
-    // EFFECTS: removes timer listener from this timer
-    public void removeTimerListener(TimerListener listener) {
-        listenerList.remove(TimerListener.class, listener);
     }
 
     // EFFECTS: fires a tick event to all TimerListeners

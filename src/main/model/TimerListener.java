@@ -1,6 +1,4 @@
-package model.listener;
-
-import model.event.TimerEvent;
+package model;
 
 import java.util.EventListener;
 

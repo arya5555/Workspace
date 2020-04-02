@@ -4,10 +4,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 // represents a to-do list, which contains a list of tasks
-public class ToDoList {
+public class ToDoList implements Iterable<Task> {
     public static final String COMPLETED_TASK_PREFIX = "";
     List<Task> tasks;
 
@@ -79,11 +80,6 @@ public class ToDoList {
         return descriptions;
     }
 
-    // getters
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
     // EFFECTS: returns a JSON array containing all tasks in to-do list
     public JSONArray getListAsJson() {
         JSONArray tasksList = new JSONArray();
@@ -95,5 +91,15 @@ public class ToDoList {
         }
 
         return tasksList;
+    }
+
+    // getters
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    @Override
+    public Iterator<Task> iterator() {
+        return tasks.iterator();
     }
 }

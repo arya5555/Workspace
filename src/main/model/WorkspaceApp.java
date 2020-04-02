@@ -52,12 +52,6 @@ public class WorkspaceApp implements Saveable {
     }
 
     // MODIFIES: this
-    // EFFECTS: deletes all spaces in this workspace;
-    public void deleteAllSpaces() {
-        spaces = new ArrayList<>();
-    }
-
-    // MODIFIES: this
     // EFFECTS: removes space with given name from this workspace app
     public void removeSpace(String name) {
         spaces.remove(getSpaceOfName(name));
@@ -100,13 +94,6 @@ public class WorkspaceApp implements Saveable {
     // MODIFIES: this
     // EFFECTS: loads spaces from WORKSPACE_FILE, if that file exists;
     //          otherwise throws IOException if file does not exist, or InvalidFormatException
-    public void loadSpaces() throws IOException, InvalidFormatException {
-        loadSpaces((WORKSPACE_FILE));
-    }
-
-    // MODIFIES: this
-    // EFFECTS: loads spaces from WORKSPACE_FILE, if that file exists;
-    //          otherwise throws IOException if file does not exist, or InvalidFormatException
     public void loadSpaces(String filePath) throws IOException, InvalidFormatException {
         List<Space> spaces = Reader.readSpaces(new File(filePath));
         this.spaces = spaces;
@@ -115,29 +102,15 @@ public class WorkspaceApp implements Saveable {
     // EFFECTS: throws IOException if there is an error writing to file
     //          saves state of all spaces in workspace to WORKSPACE_FILE
     public void saveSpaces() throws IOException {
-        Writer writer = new Writer(new File(WORKSPACE_FILE));
+        saveSpaces(WORKSPACE_FILE);
+    }
+
+    // EFFECTS: throws IOException if there is an error writing to file
+    //          saves state of all spaces in workspace to given file
+    public void saveSpaces(String file) throws IOException {
+        Writer writer = new Writer(new File(file));
         writer.write(this);
         writer.close();
-    }
-
-    // EFFECTS: stores workspace data in database, or displays error message if unable
-    public void backupData(Account account) throws SQLException, IOException, ParseException {
-        DatabaseTool databaseTool = new DatabaseTool();
-        JSONArray data = Reader.readFile(new File(WORKSPACE_FILE));
-        databaseTool.backupData(account, data);
-    }
-
-    // MODIFES: this
-    // EFFECTS: overwrites local save data with backed up data
-    public void restoreBackup(Account account) throws IOException, InvalidFormatException, SQLException,
-            NoBackupFoundException {
-        DatabaseTool databaseTool = new DatabaseTool();
-        JSONArray data = databaseTool.retrieveBackup(account);
-
-        Writer writer = new Writer(new File(WORKSPACE_FILE));
-        writer.write(data.toString());
-        writer.close();
-        loadSpaces();
     }
 
     //getters

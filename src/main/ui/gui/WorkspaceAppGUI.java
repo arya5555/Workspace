@@ -1,5 +1,6 @@
 package ui.gui;
 
+import model.Account;
 import model.Space;
 import model.exception.CancelledException;
 import ui.WorkspaceAppUI;
@@ -9,10 +10,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Observable;
+import java.util.Observer;
 
 // Graphic interface for a workspace app
 // Source: SimpleDrawingPlayer app
-public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
+public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent, Observer {
 
     // Button names/tooltips and action commands
     private static final String ADD_SPACE_BUTTON = "Add space";
@@ -49,7 +52,9 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
     // MODIFIES: this
     // EFFECTS: initializes workspace and gui
     private void init() {
-        guiFrame.setJMenuBar(new WorkspaceMenuBar(this));
+        WorkspaceMenuBar menuBar = new WorkspaceMenuBar(guiFrame);
+        menuBar.addObserver(this);
+        guiFrame.setJMenuBar(menuBar.getMenuBar());
         guiFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -116,7 +121,6 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         guiFrame.refresh();
     }
 
-
     // MODIFIES: this
     // EFFECTS: creates toolbar
     private void createToolbar() {
@@ -133,6 +137,11 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         toolbar.setOpaque(true);
 
         guiFrame.getContentPane().add(toolbar, BorderLayout.SOUTH);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(new JLabel("hi"));
+        guiFrame.add(panel, BorderLayout.EAST);
     }
 
     // MODIFIES: this
@@ -183,12 +192,6 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
     }
 
     // MODIFIES: this
-    // EFFECTS: makes edit space toolbar visible and delete space toolbar invisible
-    private void showEditSpaceToolbar() {
-        toolbarLayout.show(toolbar, EDIT_TOOLBAR_NAME);
-    }
-
-    // MODIFIES: this
     // EFFECTS: processes button clicks
     private void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(ADD_SPACE_BUTTON)) {
@@ -204,7 +207,7 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
                 guiFrame.refresh();
             } else {
                 guiFrame.setVisible(false);
-                new SpaceGUI(workspace.getSpaceOfName(e.getActionCommand()), guiFrame);
+                runSpace(workspace.getSpaceOfName(e.getActionCommand()));
             }
         }
     }
@@ -216,7 +219,7 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         String spaceName;
 
         try {
-            spaceName = guiFrame.popupTextField("Enter name of your new space");
+            spaceName = GuiFrame.popupTextField("Enter name of your new space");
         } catch (CancelledException e) {
             return;
         }
@@ -247,19 +250,36 @@ public class WorkspaceAppGUI extends WorkspaceAppUI implements GuiComponent {
         deleteMode = false;
     }
 
+    @Override
+    protected void displayMessage(String message) {
+        GuiFrame.displayMessage(message);
+    }
+
+    @Override
+    protected void runSpace(Space space) {
+        new SpaceGUI(space, guiFrame);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: follows appropriate
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o.getClass().equals(WorkspaceMenuBar.class) && arg.getClass().equals(MenuBarEvent.class)) {
+            MenuBarEvent argument = (MenuBarEvent) arg;
+            if (argument.getEventType().equals(MenuBarEvent.EventType.SAVE_SPACES)) {
+                saveSpaces();
+            } else if (argument.getEventType().equals(MenuBarEvent.EventType.LOAD_SAVE_DATA)) {
+                loadSaveData((String) argument.getObject());
+            } else if (argument.getEventType().equals(MenuBarEvent.EventType.BACKUP_DATA)) {
+                backupData((Account) argument.getObject());
+            } else {
+                restoreBackup((Account) argument.getObject());
+            }
+        }
+    }
+
     // getters
     public JFrame getJFrame() {
         return guiFrame;
-    }
-
-    @Override
-    protected void displayMessage(String message) {
-        guiFrame.displayMessage(message);
-    }
-
-    // EFFECTS: runs the GUI for the given space
-    @Override
-    protected void runSpace(Space space) {
-        //
     }
 }

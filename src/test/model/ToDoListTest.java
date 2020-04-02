@@ -38,9 +38,20 @@ public class ToDoListTest {
         Task todo1 = new Task("Todo 1");
         todo.addTask(todo1);
         todo.removeTask(0);
+        todo.addTask(todo1);
+        todo.removeTask("Todo 1");
 
         assertEquals(0, todo.getNumToDos());
         assertFalse(todo.getTasks().contains(todo1));
+    }
+
+    @Test
+    public void testRemoveCompletedTasks() {
+        addTwoTestTasks();
+        todo.completeTask(1);
+        todo.deleteCompletedTasks();
+
+        assertEquals(1, todo.getNumToDos());
     }
 
     @Test
@@ -50,6 +61,23 @@ public class ToDoListTest {
 
         assertFalse(todo.getTasks().get(0).getComplete());
         assertTrue(todo.getTasks().get(1).getComplete());
+
+        todo.completeTask("Todo 1");
+        assertTrue(todo.getTasks().get(0).getComplete());
+    }
+
+    @Test
+    public void testIterator() {
+        addTwoTestTasks();
+        int i = 0;
+        for (Task t : todo) {
+            if (i == 0) {
+                assertEquals("Todo 1", t.getDescription());
+            } else {
+                assertEquals("Todo 2", t.getDescription());
+            }
+            i++;
+        }
     }
 
     @Test

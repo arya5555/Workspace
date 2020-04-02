@@ -5,6 +5,7 @@ import model.Space;
 import model.WorkspaceApp;
 import model.exception.InvalidFormatException;
 import model.exception.NoBackupFoundException;
+import network.DatabaseBackupManager;
 import network.DatabaseTool;
 import org.json.simple.JSONArray;
 import persistence.Reader;
@@ -68,7 +69,8 @@ public abstract class WorkspaceAppUI {
     // EFFECTS: stores workspace data in database, or displays error message if unable
     public void backupData(Account account) {
         try {
-            workspace.backupData(account);
+            saveSpaces();
+            DatabaseBackupManager.backupData(account);
             displayMessage("Data successfully backed up.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -82,16 +84,14 @@ public abstract class WorkspaceAppUI {
     // EFFECTS: overwrites local save data with backed up data and displays feedback message
     public void restoreBackup(Account account) {
         try {
-            workspace.restoreBackup(account);
-            refresh();
+            DatabaseBackupManager.restoreBackup(account);
+            loadSaveData();
         } catch (SQLException e) {
             displayMessage("Failed to connect to database to retrieve backup.");
         } catch (NoBackupFoundException e) {
             displayMessage("No backup found for this account.");
         } catch (IOException ex) {
             displayMessage("Failed to save retrieved data to " + WORKSPACE_FILE + ". Data was not restored.");
-        } catch (InvalidFormatException ex) {
-            // programming error
         }
     }
 }

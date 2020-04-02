@@ -85,6 +85,16 @@ public class SpaceTest {
     }
 
     @Test
+    public void testRemoveResourceByName() {
+        space.setResources(testResources);
+
+        space.removeResource("Textbook");
+
+        assertEquals(1, space.numResources());
+        assertTrue(space.getResources().contains(googleLink));
+    }
+
+    @Test
     public void testGetAllResources() {
         space.setResources(testResources);
 

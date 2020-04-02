@@ -68,7 +68,19 @@ Save > Save locally in the top menu bar (or backup online).
 - You can reload the state of my application by selecting Load > Load local save in the top menu bar (or restore online backup).
 
 ## Phase 4
-# Task 2
+# Phase 4: Task 2
 Type hierarchy: WebsiteLink and FilePath implement Resource (and AppShortcut extends FilePath)
 An example of an overridden method implemented differently is setPath(); in FilePath it checks that the path
 leads to a valid file, while in WebsiteLink it checks that the path is a valid URL.
+
+# Phase 4: Task 3
+- Problem 1: Too much coupling in WorkspaceMenuBar (it takes a reference to the calling WorkspaceAppGUI)
+- Problem 2: Poor cohesion in Space; collection of methods deals with timer, and another deals with resources
+- Problem 3: Poor cohesion in WorkspaceApp; collection of methods deals with data backup, which is not directly
+related to the WorkspaceApp model
+- Problem 4: Poor cohesion in SpaceGUI; collection of methods apply to each of the 3 individual panels in the gui
+
+Improvements:
+- Problem 1: Refactored using observer pattern so that WorkspaceMenuBar no longer takes a WorkspaceAppGUI 
+parameter to call its methods, now it notifies the WorkspaceAppUI observer to call certain methods.
+- Problem 3: Extracted methods to do with online data backup and placed them in their own class, DatabaseBackupManager

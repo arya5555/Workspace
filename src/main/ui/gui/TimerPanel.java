@@ -1,15 +1,14 @@
 package ui.gui;
 
 import model.WorkTimer;
-import model.event.TimerEvent;
+import model.TimerEvent;
 import model.exception.SystemNotSupportedException;
-import model.listener.TimerListener;
+import model.TimerListener;
 import platformspecific.SystemTrayTool;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -41,7 +40,6 @@ public class TimerPanel extends JPanel implements GuiComponent {
     private JPanel toolbar;
     private CardLayout toolbarLayout;
     private String spaceName;
-    private boolean timerRunning;
     private SystemTrayTool trayTool;
     private boolean isTraySupported;
 
@@ -50,7 +48,6 @@ public class TimerPanel extends JPanel implements GuiComponent {
         super(new BorderLayout());
         timer = new WorkTimer(0, DEFAULT_TIME);
         spaceName = title;
-        timerRunning = false;
         isTraySupported = true;
 
         init(title);

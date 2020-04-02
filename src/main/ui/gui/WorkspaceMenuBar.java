@@ -12,21 +12,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Observable;
 
 // a menu bar for a workspace app; UI for data backups and retrieval
-public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
+public class WorkspaceMenuBar extends Observable implements GuiComponent {
+    private JMenuBar menuBar;
     private JMenu saveMenu;
     private JMenu loadMenu;
     private JMenuItem backup;
     private JMenuItem restore;
     private JMenuItem load;
     private JMenuItem save;
-    WorkspaceAppGUI parent;
+    JFrame parentFrame;
 
     // EFFECTS: constructs MenuBar for workspace
-    WorkspaceMenuBar(WorkspaceAppGUI parent) {
+    WorkspaceMenuBar(JFrame parentFrame) {
         super();
-        this.parent = parent;
+        this.parentFrame = parentFrame;
+        menuBar = new JMenuBar();
         saveMenu = new JMenu("Save");
         loadMenu = new JMenu("Load");
         save = new JMenuItem("Save locally");
@@ -43,33 +46,39 @@ public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
         loadMenu.add(load);
         loadMenu.add(restore);
 
-        add(saveMenu);
+        menuBar.add(saveMenu);
         JLabel separator = new JLabel();
         separator.setPreferredSize(new Dimension(MARGIN, MARGIN));
-        add(separator);
-        add(loadMenu);
+        menuBar.add(separator);
+        menuBar.add(loadMenu);
     }
 
     // MODIFIES: this
     // EFFECTS: processes clicks on menu items
     private void actionPerformed(ActionEvent e) {
+        setChanged();
         if (e.getSource() == backup) {
             try {
-                parent.saveSpaces();
-                parent.backupData(getAccount());
+                notifyObservers(new MenuBarEvent(MenuBarEvent.EventType.SAVE_SPACES,
+                        null));
+                setChanged();
+                notifyObservers(new MenuBarEvent(MenuBarEvent.EventType.BACKUP_DATA,
+                        getAccount()));
             } catch (FailedToGetAccountException ex) {
                 // No message required
             }
         } else if (e.getSource() == restore) {
             try {
-                parent.restoreBackup(getAccount());
+                notifyObservers(new MenuBarEvent(MenuBarEvent.EventType.RESTORE_BACKUP,
+                        getAccount()));
             } catch (FailedToGetAccountException ex) {
                 // No message required
             }
         } else if (e.getSource() == load) {
             loadSaveFile();
         } else if (e.getSource() == save) {
-            parent.saveSpaces();
+            notifyObservers(new MenuBarEvent(MenuBarEvent.EventType.SAVE_SPACES,
+                    null));
         }
     }
 
@@ -78,7 +87,7 @@ public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
     private Account getAccount() throws FailedToGetAccountException {
         String[] options = {"Sign in", "Create an account"};
 
-        int result = JOptionPane.showOptionDialog(parent.getJFrame(), "Sign in or create a new account",
+        int result = JOptionPane.showOptionDialog(parentFrame, "Sign in or create a new account",
                 "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
         if (result == 0) {
@@ -98,7 +107,7 @@ public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
 
         JPanel panel = createSignInPanel(nameField, passField);
 
-        int result = JOptionPane.showConfirmDialog(parent.getJFrame(), panel, "Sign in",
+        int result = JOptionPane.showConfirmDialog(parentFrame, panel, "Sign in",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
@@ -133,7 +142,7 @@ public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
 
         JPanel panel = createSignInPanel(nameField, passField);
 
-        int result = JOptionPane.showConfirmDialog(parent.getJFrame(), panel, "Create an account",
+        int result = JOptionPane.showConfirmDialog(parentFrame, panel, "Create an account",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
@@ -187,11 +196,18 @@ public class WorkspaceMenuBar extends JMenuBar implements GuiComponent {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON FILES", "json");
         fileChooser.setFileFilter(filter);
 
-        int result = fileChooser.showOpenDialog(parent.getJFrame());
+        int result = fileChooser.showOpenDialog(parentFrame);
 
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            parent.loadSaveData(file.getPath());
+            setChanged();
+            notifyObservers(new MenuBarEvent(MenuBarEvent.EventType.LOAD_SAVE_DATA,
+                    file.getPath()));
         }
+    }
+
+    // getters
+    public JMenuBar getMenuBar() {
+        return menuBar;
     }
 }

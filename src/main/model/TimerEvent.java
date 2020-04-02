@@ -1,4 +1,4 @@
-package model.event;
+package model;
 
 import model.WorkTimer;
 
@@ -25,18 +25,6 @@ public class TimerEvent extends EventObject {
     }
 
     // getters
-    public int getHours() {
-        return hours;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public int getSeconds() {
-        return seconds;
-    }
-
     public String getTimeString() {
         return timeString;
     }
