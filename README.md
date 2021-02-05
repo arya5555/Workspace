@@ -20,17 +20,17 @@ other applications, such as by opening links and app shortcuts.
 
 ### Functionality
 
-**Base features that will be included in each space:**
+**Implemented features:**
 - Pin relevant website links, with button to quickly open all in new browser window
 - Pin relevant directories, with buttons to open pinned files or visit directories in file explorer
 - Pin shortcuts to relevant applications
 - To-do list
 - Start timer when you begin working, which plays a sound once finished
   - Once time is up, user can choose to add time, stop working, or time a short break
-
-**Additional features that could be added as time allows:**
-- To-do list can have due-dates and priority
 - Account to back up data online
+
+**Additional features to be added in the future:**
+- To-do list can have due-dates and priority
 - Collaborative group spaces
   - Spaces are accessible by invited group members
   - Group chat within space
@@ -57,7 +57,7 @@ distraction
 - As a user, I want to be able to backup my data to an online database
 - As a user, I want to be able to restore data that is backed up online
 
-## Phase 3 Instructions for Grader
+## Example of how to run:
 - Load the app by running main. It will preload some sample save data.
 - You can generate the first required event by clicking the plus button in the bottom right corner to add a new space
 - You can generate the second required event by clicking one of the listed spaces to display its contents 
@@ -66,21 +66,3 @@ don't have to wait for the timer to tick down) and pressing start, the time will
 - You can save the state of my application by pressing the exit button to return to the main menu, then selecting 
 Save > Save locally in the top menu bar (or backup online).
 - You can reload the state of my application by selecting Load > Load local save in the top menu bar (or restore online backup).
-
-## Phase 4
-# Phase 4: Task 2
-Type hierarchy: WebsiteLink and FilePath implement Resource (and AppShortcut extends FilePath)
-An example of an overridden method implemented differently is setPath(); in FilePath it checks that the path
-leads to a valid file, while in WebsiteLink it checks that the path is a valid URL.
-
-# Phase 4: Task 3
-- Problem 1: Too much coupling in WorkspaceMenuBar (it takes a reference to the calling WorkspaceAppGUI)
-- Problem 2: Poor cohesion in Space; collection of methods deals with timer, and another deals with resources
-- Problem 3: Poor cohesion in WorkspaceApp; collection of methods deals with data backup, which is not directly
-related to the WorkspaceApp model
-- Problem 4: Poor cohesion in SpaceGUI; collection of methods apply to each of the 3 individual panels in the gui
-
-Improvements:
-- Problem 1: Refactored using observer pattern so that WorkspaceMenuBar no longer takes a WorkspaceAppGUI 
-parameter to call its methods, now it notifies the WorkspaceAppUI observer to call certain methods.
-- Problem 3: Extracted methods to do with online data backup and placed them in their own class, DatabaseBackupManager
