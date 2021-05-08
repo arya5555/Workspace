@@ -1,7 +1,7 @@
 # Workspace
 
 * Note: The database for user uploads is not currently running. 
-* 
+
 ## A consolidated launchpad and organizer for your projects
 
 Workspace is intended to improve focus and productivity. Work is organized into "spaces", where each space consists of 
